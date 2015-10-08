@@ -1,17 +1,18 @@
 #pragma once
 #include <string>
-
-using namespace std;
-
+#include <SFML/Graphics.hpp>
 class Map
 {
 public:
 	Map();
 	~Map();
 
-	int LoadFromFile(string path) {
-		
-		return 0; //Error
-	}
+	sf::Texture diffuseMap;
+	sf::Texture collisionMap;
+
+	sf::Sprite diffuseSprite;
+	sf::Sprite collisionSprite;
+
+	int LoadFromFile(std::string);
 };
 

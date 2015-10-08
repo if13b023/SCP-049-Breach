@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <fstream>
+#include "Map.h"
 
 using namespace std;
 
@@ -8,8 +8,11 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SCP-049-Breach");
 
+	Map main;
+	main.LoadFromFile("./tex/testMap.jpg");
+
 	sf::Texture texture;
-	if (!texture.loadFromFile("./Sprite_01.png"))
+	if (!texture.loadFromFile("./tex/Sprite_01.png"))
 	{
 		cout << "Failed to load Texture" << endl;
 	}
@@ -29,6 +32,7 @@ int main()
 		}
 
 		window.clear();
+		window.draw(main.diffuseSprite);
 		window.draw(testSprite);
 		window.display();
 	}
