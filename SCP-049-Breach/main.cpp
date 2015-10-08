@@ -1,14 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(400, 400), "SCP-049-Breach");
+	sf::RenderWindow window(sf::VideoMode(1280, 720), "SCP-049-Breach");
 
 	sf::Texture texture;
-	if (!texture.loadFromFile("C:/FH/Sem5/GameDev/SCP-049-Breach/x64/Debug/tex/Sprite_01.png"))
+	if (!texture.loadFromFile("./Sprite_01.png"))
 	{
 		cout << "Failed to load Texture" << endl;
 	}
