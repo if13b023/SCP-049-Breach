@@ -9,15 +9,18 @@ Map::~Map()
 {
 }
 
-int Map::LoadFromFile(std::string path)
+int Map::LoadFromFile(char* pathDiff, char* pathColl)
 {
-	if (!diffuseMap.loadFromFile(path))
+	if (!diffuseMap.loadFromFile(pathDiff))
 		return 1;//Error
-	if (!collisionMap.loadFromFile(path.append("_c")))
+	if (!collisionMap.loadFromFile(pathColl))
 		return 1;//Error
 	
 	diffuseSprite.setTexture(diffuseMap);
-	collisionSprite.setTexture(collisionMap);
 
 	return 0; //Everything OK
+}
+
+sf::Sprite Map::getDiffuseSprite() {
+	return diffuseSprite;
 }

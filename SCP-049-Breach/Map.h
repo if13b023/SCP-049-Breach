@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
+
 #include <SFML/Graphics.hpp>
+
 class Map
 {
 public:
@@ -10,9 +11,12 @@ public:
 	sf::Texture diffuseMap;
 	sf::Texture collisionMap;
 
+	sf::Sprite getDiffuseSprite();
+
+	int LoadFromFile(char*, char*);
+
+private:
 	sf::Sprite diffuseSprite;
 	sf::Sprite collisionSprite;
-
-	int LoadFromFile(std::string);
 };
 
