@@ -1,8 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "GameObject.h"
 
-class Map
+class Map: public GameObject
 {
 public:
 	Map();
