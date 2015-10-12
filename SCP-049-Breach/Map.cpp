@@ -13,8 +13,9 @@ int Map::LoadFromFile(char* pathDiff, char* pathColl)
 {
 	if (!diffuseMap.loadFromFile(pathDiff))
 		return 1;//Error
-	if (!collisionMap.loadFromFile(pathColl))
-		return 1;//Error
+	collisionMap.loadFromFile(pathColl);
+	//if (!collisionMap.loadFromFile(pathColl))
+	//	return 1;//Error
 	
 	diffuseSprite.setTexture(diffuseMap);
 

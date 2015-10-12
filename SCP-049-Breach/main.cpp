@@ -10,7 +10,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SCP-049-Breach");
 
 	Map main;
-	main.LoadFromFile("./tex/testMap.png", "./tex/testMap_c.png");
+	main.LoadFromFile("./tex/Level1.jpg", "./tex/Level1.jpg");
 
 	sf::Texture texture;
 	if (!texture.loadFromFile("./tex/Sprite_01.png"))
