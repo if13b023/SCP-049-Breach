@@ -124,31 +124,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\Math.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.cpp" />
-    <ClCompile Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\Math.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp" />
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="LightShapeMaker.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\Math.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.h" />
-    <ClInclude Include="..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\Math.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="LightShapeMaker.h" />
   </ItemGroup>

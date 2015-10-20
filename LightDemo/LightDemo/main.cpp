@@ -44,7 +44,7 @@ int main()
 	penumbraTexture.setSmooth(true);
 
 	sf::Texture pointLightTexture;
-	pointLightTexture.loadFromFile("resources/pointLightTexture.png");
+	pointLightTexture.loadFromFile("resources/flashlightTexture_g.png");
 	pointLightTexture.setSmooth(true);
 
 	ltbl::LightSystem ls;
@@ -52,9 +52,11 @@ int main()
 
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
 
-	light->_emissionSprite.setOrigin(sf::Vector2f(pointLightTexture.getSize().x * 0.5f, pointLightTexture.getSize().y * 0.5f));
+	//light->_emissionSprite.setOrigin(sf::Vector2f(pointLightTexture.getSize().x * 0.5f, pointLightTexture.getSize().y * 0.5f));
+	light->_emissionSprite.setOrigin(sf::Vector2f(0, 0));
 	light->_emissionSprite.setTexture(pointLightTexture);
-	light->_emissionSprite.setScale(sf::Vector2f(12.0f, 12.0f));
+	//light->_emissionSprite.setScale(sf::Vector2f(12.0f, 12.0f));
+	light->_emissionSprite.setScale(sf::Vector2f(1.0f, 1.0f));
 	light->_emissionSprite.setColor(sf::Color(200, 200, 200));
 	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
@@ -198,7 +200,12 @@ int main()
 
 		//std::cout << mousePos.x << " " << mousePos.y << std::endl;
 
-		light->_emissionSprite.setPosition(sf::Vector2f(mousePos.x, mousePos.y));
+		//light->_emissionSprite.setPosition(sf::Vector2f(mousePos.x, mousePos.y));
+		light->_emissionSprite.setPosition(view.getCenter());
+
+		//Flashlight Rotation
+		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
+		light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f)+135.0f);
 
 		window.clear();
 
@@ -221,7 +228,7 @@ int main()
 		cnt++;
 		if (cnt%10 == 0 && show_fps)
 		{
-			std::cout << dt << " - " << (1.0f / dt) << std::endl;
+			std::cout << dt << " - " << (1.0f / dt) << " - "  << (atan2f(v.y,v.x) * 180 / 3.1415f) << std::endl;
 			cnt = 0;
 		}
 	}
