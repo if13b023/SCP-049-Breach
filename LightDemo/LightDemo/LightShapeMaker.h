@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ltbl\lighting\LightPointEmission.h>
 #include <ltbl\lighting\LightShape.h>
 
 #include <SFML\Window\Mouse.hpp>
@@ -12,6 +11,7 @@ public:
 	~LightShapeMaker();
 
 	int addHexToList(std::map<int, std::shared_ptr<ltbl::LightShape>>&, sf::Vector2f);
+	int addShapeToList(std::map<int, std::shared_ptr<ltbl::LightShape>>&, sf::Vector2f, std::vector<sf::Vector2f>&);
 
 	void begin(std::map<int, std::shared_ptr<ltbl::LightShape>>&, int);
 	bool isActive();

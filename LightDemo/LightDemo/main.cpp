@@ -45,6 +45,7 @@ int main()
 
 	sf::Texture pointLightTexture;
 	pointLightTexture.loadFromFile("resources/flashlightTexture_g.png");
+	//pointLightTexture.loadFromFile("resources/pointLightTexture.png");
 	pointLightTexture.setSmooth(true);
 
 	ltbl::LightSystem ls;
@@ -53,10 +54,10 @@ int main()
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
 
 	//light->_emissionSprite.setOrigin(sf::Vector2f(pointLightTexture.getSize().x * 0.5f, pointLightTexture.getSize().y * 0.5f));
-	light->_emissionSprite.setOrigin(sf::Vector2f(0, 0));
+	light->_emissionSprite.setOrigin(sf::Vector2f(20.0f, 20.0f));
 	light->_emissionSprite.setTexture(pointLightTexture);
 	//light->_emissionSprite.setScale(sf::Vector2f(12.0f, 12.0f));
-	light->_emissionSprite.setScale(sf::Vector2f(1.0f, 1.0f));
+	light->_emissionSprite.setScale(sf::Vector2f(1.5f, 1.5f));
 	light->_emissionSprite.setColor(sf::Color(200, 200, 200));
 	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
@@ -93,12 +94,13 @@ int main()
 	int cnt = 0;
 
 	sf::View view = window.getDefaultView();
+	view.zoom(0.5f);
 	//view.setCenter(sf::Vector2f(bgImg.getSize().x*0.5f, bgImg.getSize().y*0.5f));
 	//view.zoom(0.5f);
 	FileWriter fw;
-	bool show_fps = true;
+	bool show_fps = false;
 
-	window.setVerticalSyncEnabled(true);
+	window.setVerticalSyncEnabled(false);
 	float moveSpeed = 500.0f;
 
 	while (!quit)
@@ -177,7 +179,17 @@ int main()
 			{
 				switch (eve.key.code)
 				{
-					default:
+					case sf::Keyboard::Num1:
+						std::cout << "ADD LINE!\n";
+						std::vector<sf::Vector2f>* pts = new std::vector<sf::Vector2f>();
+
+						pts->push_back(sf::Vector2f(-50, -50));
+						pts->push_back(sf::Vector2f(+50, +50));
+
+						//int index = lsm.addHexToList(lightShapes, mousePos);
+						int index = lsm.addShapeToList(lightShapes, mousePos, *pts);
+						ls.addShape(lightShapes.at(index));
+						delete pts;
 					break;
 				}
 			}
@@ -201,6 +213,7 @@ int main()
 		//std::cout << mousePos.x << " " << mousePos.y << std::endl;
 
 		//light->_emissionSprite.setPosition(sf::Vector2f(mousePos.x, mousePos.y));
+		//lightShapes.begin()->second->_shape.setPosition(sf::Vector2f(mousePos.x, mousePos.y));
 		light->_emissionSprite.setPosition(view.getCenter());
 
 		//Flashlight Rotation

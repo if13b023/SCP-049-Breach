@@ -73,3 +73,23 @@ int LightShapeMaker::finish()
 	_active = false;
 	return _lsIndex;
 }
+
+int LightShapeMaker::addShapeToList(std::map<int, std::shared_ptr<ltbl::LightShape>>& list, sf::Vector2f mouse, std::vector<sf::Vector2f>& pts)
+{
+	int Index = list.size() + 1;
+
+	list[Index] = std::make_shared<ltbl::LightShape>();
+
+	list[Index]->_shape.setPointCount(pts.size());
+
+	for (int i = 0; i < pts.size(); i++)
+	{
+		list[Index]->_shape.setPoint(i, pts.at(i));
+	}
+
+	list[Index]->_shape.setPosition(mouse);
+
+	list[Index]->_renderLightOverShape = true;
+
+	return Index;
+}
