@@ -10,10 +10,10 @@ public:
 	LightShapeMaker();
 	~LightShapeMaker();
 
-	int addHexToList(std::map<int, std::shared_ptr<ltbl::LightShape>>&, sf::Vector2f);
-	int addShapeToList(std::map<int, std::shared_ptr<ltbl::LightShape>>&, sf::Vector2f, std::vector<sf::Vector2f>&);
+	int addHexToList(std::vector<std::shared_ptr<ltbl::LightShape>>&, sf::Vector2f);
+	int addShapeToList(std::vector<std::shared_ptr<ltbl::LightShape>>&, sf::Vector2f, std::vector<sf::Vector2f>&);
 
-	void begin(std::map<int, std::shared_ptr<ltbl::LightShape>>&, int);
+	void begin(std::vector<std::shared_ptr<ltbl::LightShape>>&, int);
 	bool isActive();
 	void setPosition(sf::Vector2f);
 	void addPoint(sf::Vector2f);

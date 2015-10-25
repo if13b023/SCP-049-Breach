@@ -9,7 +9,7 @@ LightShapeMaker::~LightShapeMaker()
 {
 }
 
-int LightShapeMaker::addHexToList(std::map<int, std::shared_ptr<ltbl::LightShape>>& list, sf::Vector2f mouse)
+int LightShapeMaker::addHexToList(std::vector<std::shared_ptr<ltbl::LightShape>>& list, sf::Vector2f mouse)
 {
 	int Index = list.size() + 1;
 	
@@ -31,18 +31,19 @@ int LightShapeMaker::addHexToList(std::map<int, std::shared_ptr<ltbl::LightShape
 	return Index;
 }
 
-void LightShapeMaker::begin(std::map<int, std::shared_ptr<ltbl::LightShape>>& list, int pointCnt)
+void LightShapeMaker::begin(std::vector<std::shared_ptr<ltbl::LightShape>>& list, int pointCnt)
 {
 	if (_active)
 		return;
 
-	_lsIndex = list.size() + 1;
 	_active = true;
 	_pntIndex = 0;
 	_ls = std::make_shared<ltbl::LightShape>();
 	_ls->_shape.setPointCount(pointCnt);
 	
-	list[_lsIndex] = _ls;
+	list.push_back(_ls);
+
+	_lsIndex = list.size()-1;
 }
 
 bool LightShapeMaker::isActive()
@@ -74,22 +75,23 @@ int LightShapeMaker::finish()
 	return _lsIndex;
 }
 
-int LightShapeMaker::addShapeToList(std::map<int, std::shared_ptr<ltbl::LightShape>>& list, sf::Vector2f mouse, std::vector<sf::Vector2f>& pts)
+int LightShapeMaker::addShapeToList(std::vector<std::shared_ptr<ltbl::LightShape>>& list, sf::Vector2f mouse, std::vector<sf::Vector2f>& pts)
 {
-	int Index = list.size() + 1;
+	int Index;
 
-	list[Index] = std::make_shared<ltbl::LightShape>();
+	list.push_back(std::make_shared<ltbl::LightShape>());
+	Index = list.size()-1;
 
-	list[Index]->_shape.setPointCount(pts.size());
+	list.at(Index)->_shape.setPointCount(pts.size());
 
 	for (int i = 0; i < pts.size(); i++)
 	{
-		list[Index]->_shape.setPoint(i, pts.at(i));
+		list.at(Index)->_shape.setPoint(i, pts.at(i));
 	}
 
-	list[Index]->_shape.setPosition(mouse);
+	list.at(Index)->_shape.setPosition(mouse);
 
-	list[Index]->_renderLightOverShape = true;
+	list.at(Index)->_renderLightOverShape = true;
 
 	return Index;
 }

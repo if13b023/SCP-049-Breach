@@ -9,7 +9,7 @@ FileWriter::~FileWriter()
 {
 }
 
-void FileWriter::SaveLightShapes(std::string path, std::map<int, std::shared_ptr<ltbl::LightShape>>& list)
+void FileWriter::SaveLightShapes(std::string path, std::vector<std::shared_ptr<ltbl::LightShape>>& list)
 {
 	std::ofstream file;
 	file.open(path);
@@ -23,10 +23,10 @@ void FileWriter::SaveLightShapes(std::string path, std::map<int, std::shared_ptr
 	file << "start\n";
 	sf::ConvexShape ls;
 	//stackoverflow
-	for (std::map<int, std::shared_ptr<ltbl::LightShape>>::iterator it = list.begin(); it != list.end(); ++it)
+	for (std::vector<std::shared_ptr<ltbl::LightShape>>::iterator it = list.begin(); it != list.end(); ++it)
 	{
-		ls = it->second.get()->_shape;
-		file << "id:" << it->first << std::endl;
+		ls = it->get()->_shape;
+		file << "id:" << it - list.begin() << std::endl;
 		file << ls.getPosition().x << ":" << ls.getPosition().y << std::endl;
 		file << ls.getPointCount() << std::endl;
 		for (int i = 0; i < ls.getPointCount(); i++)
@@ -52,7 +52,7 @@ void FileWriter::SaveLightShapes(std::string path, std::map<int, std::shared_ptr
 	}*/
 }
 
-void FileWriter::LoadLightShapesFromFile(std::string path, std::map<int, std::shared_ptr<ltbl::LightShape>>& list, ltbl::LightSystem& ls)
+void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shared_ptr<ltbl::LightShape>>& list, ltbl::LightSystem& ls)
 {
 	std::ifstream file;
 	file.open(path);
@@ -62,7 +62,6 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::map<int, std::sh
 		return;
 	}
 
-	//Warning C4267: http://www.cplusplus.com/reference/map/map/size/ -> Member type size_type is an unsigned integral type. Ok?
 	//unsigned int Index = list.size();
 	int index = 0,
 		pnt_cnt = 0;
@@ -95,24 +94,24 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::map<int, std::sh
 		if (tmp.substr(0, pos).compare("id") == 0)
 		{
 			if(init > 0)
-				ls.addShape(list[index]);
+				ls.addShape(list.at(index));
 
 			index++;
 			pnt_cnt = 0;
 			std::cout << "*** new light shape ***\nid = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
-			list[index] = std::make_shared<ltbl::LightShape>();
+			list.push_back(std::make_shared<ltbl::LightShape>());
 			std::getline(file, tmp, '\n');
 			pos = tmp.find(':');
 			std::cout << "origin: x = " << tmp.substr(0, pos) << "\ty = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
-			list[index]->_shape.setPosition( std::stof(tmp.substr(0, pos)), std::stof(tmp.substr(pos + 1, tmp.length() - pos)));
+			list.at(index)->_shape.setPosition( std::stof(tmp.substr(0, pos)), std::stof(tmp.substr(pos + 1, tmp.length() - pos)));
 			std::getline(file, tmp, '\n');
 			std::cout << "# of point = " << tmp << std::endl;
-			list[index]->_shape.setPointCount(std::stoi(tmp));
+			list.at(index)->_shape.setPointCount(std::stoi(tmp));
 		}
 		else
 		{
 			std::cout << "x = " << tmp.substr(0, pos) << "\ty = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
-			list[index]->_shape.setPoint(pnt_cnt, sf::Vector2f(std::stof(tmp.substr(0, pos)), std::stof(tmp.substr(pos + 1, tmp.length() - pos))));
+			list.at(index)->_shape.setPoint(pnt_cnt, sf::Vector2f(std::stof(tmp.substr(0, pos)), std::stof(tmp.substr(pos + 1, tmp.length() - pos))));
 			pnt_cnt++;
 		}
 		std::getline(file, tmp, '\n');

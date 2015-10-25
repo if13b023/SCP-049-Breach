@@ -63,7 +63,8 @@ int main()
 
 	ls.addLight(light);
 
-	std::map<int, std::shared_ptr<ltbl::LightShape>> lightShapes;
+	//std::map<int, std::shared_ptr<ltbl::LightShape>> lightShapes;
+	std::vector<std::shared_ptr<ltbl::LightShape>> lightShapes;
 	/*
 	lightShapes[1] = std::make_shared<ltbl::LightShape>();
 
@@ -183,12 +184,13 @@ int main()
 						std::cout << "ADD LINE!\n";
 						std::vector<sf::Vector2f>* pts = new std::vector<sf::Vector2f>();
 
-						pts->push_back(sf::Vector2f(-50, -50));
-						pts->push_back(sf::Vector2f(+50, +50));
+						pts->push_back(sf::Vector2f(-3, -3));
+						pts->push_back(sf::Vector2f(-3, +3));
+						pts->push_back(sf::Vector2f(+3, +3));
+						pts->push_back(sf::Vector2f(+3, -3));
 
-						//int index = lsm.addHexToList(lightShapes, mousePos);
 						int index = lsm.addShapeToList(lightShapes, mousePos, *pts);
-						ls.addShape(lightShapes.at(index));
+						ls.addShape(lightShapes.at(lsm.addShapeToList(lightShapes, mousePos, *pts)));
 						delete pts;
 					break;
 				}

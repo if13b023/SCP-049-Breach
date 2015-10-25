@@ -14,7 +14,7 @@ public:
 	FileWriter();
 	~FileWriter();
 	
-	void SaveLightShapes(std::string, std::map<int, std::shared_ptr<ltbl::LightShape>>&);
-	void LoadLightShapesFromFile(std::string, std::map<int, std::shared_ptr<ltbl::LightShape>>&, ltbl::LightSystem&);
+	void SaveLightShapes(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&);
+	void LoadLightShapesFromFile(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&, ltbl::LightSystem&);
 };
 
