@@ -96,7 +96,8 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shar
 			if(init > 0)
 				ls.addShape(list.at(index));
 
-			index++;
+			//index++;
+			index = list.size();
 			pnt_cnt = 0;
 			std::cout << "*** new light shape ***\nid = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
 			list.push_back(std::make_shared<ltbl::LightShape>());
@@ -118,5 +119,5 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shar
 		init = 1;
 	} while (tmp.compare("end") != 0 && !file.bad() && !file.eof());
 
-	ls.addShape(list[index]);
+	ls.addShape(list.at(index));
 }
