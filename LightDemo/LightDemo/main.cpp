@@ -12,6 +12,14 @@
 #include "LightShapeMaker.h"
 #include "FileIO.h"
 
+bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
+{
+	std::cout << "debug -> \t" << (v.getCenter()-v.getSize()).x << ":" << (v.getCenter() - v.getSize()/2.0f).y << std::endl;
+	//if ((v.left <= pos.x) || (v.top <= pos.y))
+	//	return false;
+	return true;
+}
+
 int main()
 {
 	sf::VideoMode vm;
@@ -33,6 +41,7 @@ int main()
 
 	sf::Sprite bgSprite(bgImg);
 	bgSprite.setTextureRect(sf::IntRect(0, 0, bgImg.getSize().x, bgImg.getSize().y));
+	bgSprite.setPosition(0, 0);
 
 	sf::Shader unshadowShader;
 	sf::Shader lightOverShapeShader;
@@ -120,8 +129,12 @@ int main()
 
 			if (eve.type == sf::Event::MouseWheelScrolled)
 			{
-				std::cout << "wheel delta > " << eve.mouseWheel.delta << std::endl;
-				view.zoom(1.0f + eve.mouseWheel.delta);
+				std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
+				if (eve.mouseWheelScroll.delta < 0 && ViewportLock(view, sf::Vector2f(bgSprite.getPosition().x, bgSprite.getPosition().y)))
+					view.zoom(1.1f);
+				
+				if(eve.mouseWheelScroll.delta > 0)
+					view.zoom(0.9f);
 				break;
 			}
 
@@ -243,7 +256,7 @@ int main()
 		cnt++;
 		if (cnt%10 == 0 && show_fps)
 		{
-			std::cout << dt << " - " << (1.0f / dt) << " - "  << (atan2f(v.y,v.x) * 180 / 3.1415f) << std::endl;
+			std::cout << dt << " - " << (1.0f / dt) << " - "  << (atan2f(v.y,v.x) * 180 / 3.1415f) << " - " << std::endl;
 			cnt = 0;
 		}
 	}
