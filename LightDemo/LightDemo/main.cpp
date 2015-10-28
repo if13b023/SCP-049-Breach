@@ -43,6 +43,17 @@ int main()
 	bgSprite.setTextureRect(sf::IntRect(0, 0, bgImg.getSize().x, bgImg.getSize().y));
 	bgSprite.setPosition(0, 0);
 
+
+	sf::Texture bgTopImg;
+	//assert(bgImg.loadFromFile("data/background.png"));
+	if (!bgTopImg.loadFromFile("data/Level1_big_top.png"))
+		abort();
+	bgTopImg.setRepeated(false);
+
+	sf::Sprite bgTopSprite(bgTopImg);
+	bgTopSprite.setTextureRect(sf::IntRect(0, 0, bgTopImg.getSize().x, bgTopImg.getSize().y));
+	bgTopSprite.setPosition(0, 0);
+
 	sf::Shader unshadowShader;
 	sf::Shader lightOverShapeShader;
 	unshadowShader.loadFromFile("resources/unshadowShader.vert", "resources/unshadowShader.frag");
@@ -248,6 +259,8 @@ int main()
 		window.setView(window.getDefaultView());
 		window.draw(lightSprite, lightRenderStates);
 		window.setView(view);
+
+		window.draw(bgTopSprite);
 
 		window.display();
 
