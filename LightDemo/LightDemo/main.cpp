@@ -20,6 +20,15 @@ bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
 	return true;
 }
 
+sf::Vector2f normalize(const sf::Vector2f& source)
+{
+	float length = sqrt((source.x * source.x) + (source.y * source.y));
+	if (length != 0)
+		return sf::Vector2f(source.x / length, source.y / length);
+	else
+		return source;
+}
+
 int main()
 {
 	sf::VideoMode vm;
@@ -31,7 +40,14 @@ int main()
 	std::list<std::thread> threads;
 
 	sf::RenderWindow window;
-	window.create(vm, "Light Demo");
+	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
+//#define FULLSCREEN
+#ifdef FULLSCREEN
+	vm.height = 1080;
+	vm.width = 1920;
+	style = sf::Style::Fullscreen;
+#endif
+	window.create(vm, "Light Demo", style);
 
 	sf::Texture bgImg;
 	//assert(bgImg.loadFromFile("data/background.png"));
@@ -70,6 +86,7 @@ int main()
 
 	ltbl::LightSystem ls;
 	ls.create(sf::FloatRect(-1000.0f, -1000.0f, 1000.0f, 1000.0f), window.getSize(), penumbraTexture, unshadowShader, lightOverShapeShader);
+	ls._ambientColor = sf::Color(100, 100, 100, 255);
 
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
 
@@ -140,7 +157,8 @@ int main()
 
 			if (eve.type == sf::Event::MouseWheelScrolled)
 			{
-				std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
+				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
+
 				if (eve.mouseWheelScroll.delta < 0 && ViewportLock(view, sf::Vector2f(bgSprite.getPosition().x, bgSprite.getPosition().y)))
 					view.zoom(1.1f);
 				
@@ -226,15 +244,21 @@ int main()
 		else
 			moveSpeed = 500.0f;
 
+		sf::Vector2f moveVec;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-			view.move(sf::Vector2f(-moveSpeed*dt, 0.0f));
+			moveVec.x = -1.0f;
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-			view.move(sf::Vector2f(moveSpeed*dt, 0.0f));
+			moveVec.x = 1.0f;
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-			view.move(sf::Vector2f(0.0f, -moveSpeed*dt));
+			moveVec.y = -1.0f;
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-			view.move(sf::Vector2f(0.0f, moveSpeed*dt));
+			moveVec.y = 1.0f;
+
+		moveVec = normalize(moveVec);
+		moveVec *= (moveSpeed*dt);
+
+		view.move(moveVec);
 
 		//std::cout << mousePos.x << " " << mousePos.y << std::endl;
 

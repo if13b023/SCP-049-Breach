@@ -87,12 +87,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\..\SFML-2.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\LTBL2-master\LTBL2\source;..\..\..\SFML-2.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\SFML-2.3.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>flac.lib;freetype.lib;jpeg.lib;ogg.lib;openal32.lib;sfml-audio-d.lib;sfml-audio-s-d.lib;sfml-audio-s.lib;sfml-audio.lib;sfml-graphics-d.lib;sfml-graphics-s-d.lib;sfml-graphics-s.lib;sfml-graphics.lib;sfml-main-d.lib;sfml-main.lib;sfml-network-d.lib;sfml-network-s-d.lib;sfml-network-s.lib;sfml-network.lib;sfml-system-d.lib;sfml-system-s-d.lib;sfml-system-s.lib;sfml-system.lib;sfml-window-d.lib;sfml-window-s-d.lib;sfml-window-s.lib;sfml-window.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,12 +124,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\Math.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.cpp" />
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp" />
+    <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="LightShapeMaker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\Math.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.h" />
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h" />
+    <ClInclude Include="FileIO.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="LightShapeMaker.h" />
     <ClInclude Include="Map.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

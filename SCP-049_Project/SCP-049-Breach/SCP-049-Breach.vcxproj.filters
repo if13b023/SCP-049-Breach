@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ltbl">
+      <UniqueIdentifier>{9028a20d-e69a-4a91-b724-f566f44e4549}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,6 +27,42 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FileIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShapeMaker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\Math.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp">
+      <Filter>ltbl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -31,6 +70,42 @@
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShapeMaker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightPointEmission.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightShape.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightSystem.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\Math.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\DynamicQuadtree.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\Quadtree.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.h">
+      <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h">
+      <Filter>ltbl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
