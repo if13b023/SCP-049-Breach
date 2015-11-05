@@ -59,7 +59,9 @@ int main(int argc, char* argv)
 
 	//loading Textures and creating Sprites
 	sf::Texture bgTex;
-	assert(bgTex.loadFromFile("data/Level1_b.jpg"));
+	//assert(bgTex.loadFromFile("data/Level1_b.jpg"));
+	if (!bgTex.loadFromFile("data/Level1_b.jpg"))
+		abort();
 	bgTex.setRepeated(false);
 
 	sf::Sprite bgSprite(bgTex);
@@ -67,7 +69,7 @@ int main(int argc, char* argv)
 	bgSprite.setPosition(0, 0);
 
 	sf::Texture bgTopTex;
-	assert(bgTex.loadFromFile("data/Level1_big_top.png"));
+	assert(bgTopTex.loadFromFile("data/Level1_big_top.png"));
 	bgTopTex.setRepeated(false);
 
 	sf::Sprite bgTopSprite(bgTopTex);
@@ -97,8 +99,9 @@ int main(int argc, char* argv)
 
 	//LightSystem
 	ltbl::LightSystem ls;
+	sf::Color ambientColor = sf::Color(100, 100, 100, 255);
 	ls.create(sf::FloatRect(-1000.0f, -1000.0f, 1000.0f, 1000.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
-	ls._ambientColor = sf::Color(100, 100, 100, 255);
+	ls._ambientColor = ambientColor;
 
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
 
@@ -131,7 +134,7 @@ int main(int argc, char* argv)
 
 	window.setVerticalSyncEnabled(false);
 
-	//fw.LoadLightShapesFromFile("Level1.txt", lightShapes, ls);
+	fw.LoadLightShapesFromFile("Level1.txt", lightShapes, ls);
 	//***	INIT END
 
 	while (!quit)
@@ -239,7 +242,14 @@ int main(int argc, char* argv)
 
 		window.clear();
 
+		window.setView(view);
+
 		window.draw(bgSprite);
+
+		window.draw(characterSprite);
+
+		window.draw(bgTopSprite);
+
 		ls.render(view, unshadowShader, lightOverShapeShader);
 		sf::Sprite lightSprite;
 		lightSprite.setTexture(ls.getLightingTexture());
@@ -250,10 +260,6 @@ int main(int argc, char* argv)
 		window.setView(window.getDefaultView());
 		window.draw(lightSprite, lightRenderStates);
 		window.setView(view);
-
-		window.draw(characterSprite);
-
-		window.draw(bgTopSprite);
 
 		window.display();
 
