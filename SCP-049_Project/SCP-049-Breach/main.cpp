@@ -29,8 +29,14 @@ sf::Vector2f normalize(const sf::Vector2f& source)
 		return source;
 }
 
-int main()
+int main(int argc, char* argv)
 {
+	//argument parsing
+	for (int i = 0; i < argc; i++)
+		std::cout << argv[i] << std::endl;
+	//***
+
+	//INIT
 	sf::VideoMode vm;
 	vm.width = 1280;
 	vm.height = 720;
@@ -39,35 +45,33 @@ int main()
 
 	std::list<std::thread> threads;
 
+	//creating the window
 	sf::RenderWindow window;
 	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
-	//#define FULLSCREEN
-#ifdef FULLSCREEN
+#define FULLSCREEN 0
+#if FULLSCREEN
 	vm.height = 1080;
 	vm.width = 1920;
 	style = sf::Style::Fullscreen;
 #endif
-	window.create(vm, "Light Demo", style);
+	window.create(vm, "SCP-049-Breach", style);
+	window.setMouseCursorVisible(false);
 
-	sf::Texture bgImg;
-	//assert(bgImg.loadFromFile("data/background.png"));
-	if (!bgImg.loadFromFile("data/Level1_b.jpg"))
-		abort();
-	bgImg.setRepeated(false);
+	//loading Textures and creating Sprites
+	sf::Texture bgTex;
+	assert(bgTex.loadFromFile("data/Level1_b.jpg"));
+	bgTex.setRepeated(false);
 
-	sf::Sprite bgSprite(bgImg);
-	bgSprite.setTextureRect(sf::IntRect(0, 0, bgImg.getSize().x, bgImg.getSize().y));
+	sf::Sprite bgSprite(bgTex);
+	bgSprite.setTextureRect(sf::IntRect(0, 0, bgTex.getSize().x, bgTex.getSize().y));
 	bgSprite.setPosition(0, 0);
 
+	sf::Texture bgTopTex;
+	assert(bgTex.loadFromFile("data/Level1_big_top.png"));
+	bgTopTex.setRepeated(false);
 
-	sf::Texture bgTopImg;
-	//assert(bgImg.loadFromFile("data/background.png"));
-	if (!bgTopImg.loadFromFile("data/Level1_big_top.png"))
-		abort();
-	bgTopImg.setRepeated(false);
-
-	sf::Sprite bgTopSprite(bgTopImg);
-	bgTopSprite.setTextureRect(sf::IntRect(0, 0, bgTopImg.getSize().x, bgTopImg.getSize().y));
+	sf::Sprite bgTopSprite(bgTopTex);
+	bgTopSprite.setTextureRect(sf::IntRect(0, 0, bgTopTex.getSize().x, bgTopTex.getSize().y));
 	bgTopSprite.setPosition(0, 0);
 
 	sf::Shader unshadowShader;
@@ -75,52 +79,41 @@ int main()
 	unshadowShader.loadFromFile("resources/unshadowShader.vert", "resources/unshadowShader.frag");
 	lightOverShapeShader.loadFromFile("resources/lightOverShapeShader.vert", "resources/lightOverShapeShader.frag");
 
-	sf::Texture penumbraTexture;
-	penumbraTexture.loadFromFile("resources/penumbraTexture.png");
-	penumbraTexture.setSmooth(true);
+	sf::Texture penumbraTex;
+	penumbraTex.loadFromFile("resources/penumbraTexture.png");
+	penumbraTex.setSmooth(true);
 
-	sf::Texture pointLightTexture;
-	pointLightTexture.loadFromFile("resources/flashlightTexture_g.png");
-	//pointLightTexture.loadFromFile("resources/pointLightTexture.png");
-	pointLightTexture.setSmooth(true);
+	sf::Texture flashLightTex;
+	flashLightTex.loadFromFile("resources/flashlightTexture_g.png");
+	flashLightTex.setSmooth(true);
 
+	sf::Texture characterTex;
+	characterTex.loadFromFile("tex/Sprite_01.png");
+
+	sf::Sprite characterSprite(characterTex);
+	characterSprite.setOrigin(characterTex.getSize().x / 2, (characterTex.getSize().y / 2));
+	characterSprite.setScale(0.15, 0.15);
+	//***	loading Textures and creating Sprites
+
+	//LightSystem
 	ltbl::LightSystem ls;
-	ls.create(sf::FloatRect(-1000.0f, -1000.0f, 1000.0f, 1000.0f), window.getSize(), penumbraTexture, unshadowShader, lightOverShapeShader);
+	ls.create(sf::FloatRect(-1000.0f, -1000.0f, 1000.0f, 1000.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
 	ls._ambientColor = sf::Color(100, 100, 100, 255);
 
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
 
-	//light->_emissionSprite.setOrigin(sf::Vector2f(pointLightTexture.getSize().x * 0.5f, pointLightTexture.getSize().y * 0.5f));
-	light->_emissionSprite.setOrigin(sf::Vector2f(20.0f, 20.0f));
-	light->_emissionSprite.setTexture(pointLightTexture);
-	//light->_emissionSprite.setScale(sf::Vector2f(12.0f, 12.0f));
+	light->_emissionSprite.setOrigin(sf::Vector2f(10.0f, 10.0f));
+	light->_emissionSprite.setTexture(flashLightTex);
 	light->_emissionSprite.setScale(sf::Vector2f(1.5f, 1.5f));
 	light->_emissionSprite.setColor(sf::Color(200, 200, 200));
 	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
 	ls.addLight(light);
 
-	//std::map<int, std::shared_ptr<ltbl::LightShape>> lightShapes;
 	std::vector<std::shared_ptr<ltbl::LightShape>> lightShapes;
-	/*
-	lightShapes[1] = std::make_shared<ltbl::LightShape>();
-
-	lightShapes[1]->_shape.setPointCount(6);
-
-	lightShapes[1]->_shape.setPoint(0, sf::Vector2f(25, -43));
-	lightShapes[1]->_shape.setPoint(1, sf::Vector2f(-25, -43));
-	lightShapes[1]->_shape.setPoint(2, sf::Vector2f(-50, 0));
-	lightShapes[1]->_shape.setPoint(3, sf::Vector2f(-25, 43));
-	lightShapes[1]->_shape.setPoint(4, sf::Vector2f(25, 43));
-	lightShapes[1]->_shape.setPoint(5, sf::Vector2f(50, 0));
-
-	lightShapes[1]->_shape.setPosition(1140.0f, 236.0f);
-
-	lightShapes[1]->_renderLightOverShape = true;
-
-	ls.addShape(lightShapes.at(1));*/
 
 	LightShapeMaker lsm;
+	//***	LightSystem
 
 	sf::Event eve;
 
@@ -133,13 +126,13 @@ int main()
 
 	sf::View view = window.getDefaultView();
 	view.zoom(0.5f);
-	//view.setCenter(sf::Vector2f(bgImg.getSize().x*0.5f, bgImg.getSize().y*0.5f));
-	//view.zoom(0.5f);
 	FileWriter fw;
 	bool show_fps = false;
 
 	window.setVerticalSyncEnabled(false);
-	float moveSpeed = 500.0f;
+
+	//fw.LoadLightShapesFromFile("Level1.txt", lightShapes, ls);
+	//***	INIT END
 
 	while (!quit)
 	{
@@ -198,11 +191,6 @@ int main()
 			{
 				switch (eve.key.code)
 				{
-				case sf::Keyboard::P:
-					std::cout << "saving map...\n";
-					fw.SaveLightShapes("Level1.txt", lightShapes);
-					break;
-
 				case sf::Keyboard::T:
 					show_fps = !show_fps;
 					std::cout << "show_fps> " << show_fps << std::endl;
@@ -211,38 +199,15 @@ int main()
 				case sf::Keyboard::Escape:
 					quit = true;
 					break;
-
-				case sf::Keyboard::O:
-					fw.LoadLightShapesFromFile("Level1.txt", lightShapes, ls);
-					break;
-				}
-			}
-
-			if (eve.type == sf::Event::KeyReleased)
-			{
-				switch (eve.key.code)
-				{
-				case sf::Keyboard::Num1:
-					std::cout << "ADD LINE!\n";
-					std::vector<sf::Vector2f>* pts = new std::vector<sf::Vector2f>();
-
-					pts->push_back(sf::Vector2f(-3, -3));
-					pts->push_back(sf::Vector2f(-3, +3));
-					pts->push_back(sf::Vector2f(+3, +3));
-					pts->push_back(sf::Vector2f(+3, -3));
-
-					size_t index = lsm.addShapeToList(lightShapes, mousePos, *pts);
-					ls.addShape(lightShapes.at(lsm.addShapeToList(lightShapes, mousePos, *pts)));
-					delete pts;
-					break;
 				}
 			}
 		}
 
+		float moveSpeed;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-			moveSpeed = 1000.0f;
+			moveSpeed = 300.0f;
 		else
-			moveSpeed = 500.0f;
+			moveSpeed = 200.0f;
 
 		sf::Vector2f moveVec;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -259,6 +224,7 @@ int main()
 		moveVec *= (moveSpeed*dt);
 
 		view.move(moveVec);
+		characterSprite.setPosition(view.getCenter());
 
 		//std::cout << mousePos.x << " " << mousePos.y << std::endl;
 
@@ -269,6 +235,7 @@ int main()
 		//Flashlight Rotation
 		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
 		light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
+		characterSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
 
 		window.clear();
 
@@ -283,6 +250,8 @@ int main()
 		window.setView(window.getDefaultView());
 		window.draw(lightSprite, lightRenderStates);
 		window.setView(view);
+
+		window.draw(characterSprite);
 
 		window.draw(bgTopSprite);
 
