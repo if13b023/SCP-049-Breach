@@ -62,7 +62,7 @@ int main(int argc, char* argv)
 	//loading Textures and creating Sprites
 	sf::Texture bgTex;
 	//assert(bgTex.loadFromFile("data/Level1_b.jpg"));
-	if (!bgTex.loadFromFile("data/Level1_b.jpg"))
+	if (!bgTex.loadFromFile("data/Level1_2_big.jpg"))
 		abort();
 	bgTex.setRepeated(false);
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv)
 	bgSprite.setPosition(0, 0);
 
 	sf::Texture bgTopTex;
-	assert(bgTopTex.loadFromFile("data/Level1_big_top.png"));
+	assert(bgTopTex.loadFromFile("data/Level1_2_big_top.png"));
 	bgTopTex.setRepeated(false);
 
 	sf::Sprite bgTopSprite(bgTopTex);
@@ -144,7 +144,7 @@ int main(int argc, char* argv)
 
 	window.setVerticalSyncEnabled(true);
 
-	fw.LoadLightShapesFromFile("Level1.txt", lightShapes, ls);
+	fw.LoadLightShapesFromFile("data/Level1_2_big.jpg.txt", lightShapes, ls);
 	//***	INIT END
 
 	while (!quit)
