@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp">
       <Filter>ltbl</Filter>
     </ClCompile>
+    <ClCompile Include="MainCharacter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -106,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h">
       <Filter>ltbl</Filter>
+    </ClInclude>
+    <ClInclude Include="MainCharacter.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

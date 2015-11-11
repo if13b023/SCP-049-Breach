@@ -11,10 +11,12 @@
 
 #include "LightShapeMaker.h"
 #include "FileIO.h"
+#include "MainCharacter.h"
 
 bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
 {
-	std::cout << "debug -> \t" << (v.getCenter() - v.getSize()).x << ":" << (v.getCenter() - v.getSize() / 2.0f).y << std::endl;
+	sf::Vector2f topLeft = v.getCenter() - (v.getSize() / 2.0f);
+	std::cout << "debug -> \t" << topLeft.x << ":" << topLeft.y << std::endl;
 	//if ((v.left <= pos.x) || (v.top <= pos.y))
 	//	return false;
 	return true;
@@ -89,12 +91,19 @@ int main(int argc, char* argv)
 	flashLightTex.loadFromFile("resources/flashlightTexture_g.png");
 	flashLightTex.setSmooth(true);
 
-	sf::Texture characterTex;
+	/*sf::Texture characterTex;
 	characterTex.loadFromFile("tex/Sprite_01.png");
 
 	sf::Sprite characterSprite(characterTex);
 	characterSprite.setOrigin(characterTex.getSize().x / 2, (characterTex.getSize().y / 2));
-	characterSprite.setScale(0.15, 0.15);
+	characterSprite.setScale(0.15, 0.15);*/
+	MainCharacter mainChar;
+	if (!mainChar.setSprite("tex/Sprite_01.png"))
+	{
+		std::cout << "Couldn't load \"tex / Sprite_01.png\"." << std::endl;
+		return 1;
+	}
+	mainChar.setScale(0.15f);
 	//***	loading Textures and creating Sprites
 
 	//LightSystem
@@ -129,6 +138,7 @@ int main(int argc, char* argv)
 
 	sf::View view = window.getDefaultView();
 	view.zoom(0.5f);
+	mainChar.setPosition(view.getCenter());
 	FileWriter fw;
 	bool show_fps = false;
 
@@ -155,7 +165,7 @@ int main(int argc, char* argv)
 			{
 				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
 
-				if (eve.mouseWheelScroll.delta < 0 && ViewportLock(view, sf::Vector2f(bgSprite.getPosition().x, bgSprite.getPosition().y)))
+				if (eve.mouseWheelScroll.delta < 0 && ViewportLock(view, bgSprite.getPosition()))
 					view.zoom(1.1f);
 
 				if (eve.mouseWheelScroll.delta > 0)
@@ -226,19 +236,28 @@ int main(int argc, char* argv)
 		moveVec = normalize(moveVec);
 		moveVec *= (moveSpeed*dt);
 
-		view.move(moveVec);
-		characterSprite.setPosition(view.getCenter());
+		//view.move(moveVec);
 
-		//std::cout << mousePos.x << " " << mousePos.y << std::endl;
+		//CollisionDetection
+		mainChar.move(moveVec);
+		for (int i = 0; i < lightShapes.size(); ++i)
+		{
+			if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()))
+			{
+				//std::cout << "Collision!" << dt << std::endl;
+				mainChar.move(-moveVec);
+				//view.move(-moveVec);
+			}
+		}
+		//*** CD
 
-		//light->_emissionSprite.setPosition(sf::Vector2f(mousePos.x, mousePos.y));
-		//lightShapes.begin()->second->_shape.setPosition(sf::Vector2f(mousePos.x, mousePos.y));
-		light->_emissionSprite.setPosition(view.getCenter());
+		view.setCenter(mainChar.getPosition());
+		light->_emissionSprite.setPosition(mainChar.getPosition());
 
 		//Flashlight Rotation
 		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
 		light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
-		characterSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
+		mainChar.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
 
 		window.clear();
 
@@ -246,7 +265,7 @@ int main(int argc, char* argv)
 
 		window.draw(bgSprite);
 
-		window.draw(characterSprite);
+		window.draw(mainChar.getSprite());
 
 		window.draw(bgTopSprite);
 
@@ -268,6 +287,7 @@ int main(int argc, char* argv)
 		cnt++;
 		if (cnt % 10 == 0 && show_fps)
 		{
+			std::cout << mainChar.getPosition().x << " " << mainChar.getPosition().y << std::endl;
 			std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << " - " << std::endl;
 			cnt = 0;
 		}
