@@ -20,18 +20,24 @@ public:
 
 	void setScale(float);
 
+	float getStamina();
+	float getWalkSpeed();
+
+	void runs(float);
+	void walks(float);
+
 	sf::FloatRect getBoundingBox();
 
 	void move(sf::Vector2f);
-
-	int health;
-	float walkSpeed;
 
 private:
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
 	sf::Vector2f position;
 	float boundingSize;
+	float stamina;
+	float health;
+	float walkSpeed;
 	void updateBoundingSize();
 };
 

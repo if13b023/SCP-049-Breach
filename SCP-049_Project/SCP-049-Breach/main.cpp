@@ -142,7 +142,7 @@ int main(int argc, char* argv)
 	FileWriter fw;
 	bool show_fps = false;
 
-	window.setVerticalSyncEnabled(false);
+	window.setVerticalSyncEnabled(true);
 
 	fw.LoadLightShapesFromFile("Level1.txt", lightShapes, ls);
 	//***	INIT END
@@ -216,11 +216,10 @@ int main(int argc, char* argv)
 			}
 		}
 
-		float moveSpeed;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-			moveSpeed = 300.0f;
+			mainChar.runs(dt);
 		else
-			moveSpeed = 200.0f;
+			mainChar.walks(dt);
 
 		sf::Vector2f moveVec;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -234,7 +233,7 @@ int main(int argc, char* argv)
 			moveVec.y = 1.0f;
 
 		moveVec = normalize(moveVec);
-		moveVec *= (moveSpeed*dt);
+		moveVec *= (mainChar.getWalkSpeed() * dt);
 
 		//view.move(moveVec);
 
@@ -242,7 +241,7 @@ int main(int argc, char* argv)
 		mainChar.move(moveVec);
 		for (int i = 0; i < lightShapes.size(); ++i)
 		{
-			if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()))
+			if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()) || !bgSprite.getGlobalBounds().contains(mainChar.getPosition()))
 			{
 				//std::cout << "Collision!" << dt << std::endl;
 				mainChar.move(-moveVec);
@@ -287,8 +286,7 @@ int main(int argc, char* argv)
 		cnt++;
 		if (cnt % 10 == 0 && show_fps)
 		{
-			std::cout << mainChar.getPosition().x << " " << mainChar.getPosition().y << std::endl;
-			std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << " - " << std::endl;
+			std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << " - " << mainChar.getStamina() << std::endl;
 			cnt = 0;
 		}
 	}

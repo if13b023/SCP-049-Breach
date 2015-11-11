@@ -5,7 +5,8 @@
 MainCharacter::MainCharacter()
 	:	health(100),
 		position(0, 0),
-		walkSpeed(300.0f)
+		walkSpeed(200.0f),
+		stamina(100.0f)
 {
 }
 
@@ -22,7 +23,7 @@ bool MainCharacter::setSprite(const char* path)
 
 	m_sprite.setTexture(m_texture);
 	m_sprite.setTextureRect(sf::IntRect(0, 0, m_texture.getSize().x, m_texture.getSize().y));
-	m_sprite.setOrigin(m_texture.getSize().x / 2, (m_texture.getSize().y / 2));
+	m_sprite.setOrigin(m_texture.getSize().x / 2.0f, (m_texture.getSize().y / 2.0f));
 	m_sprite.setPosition(position);
 
 	updateBoundingSize();
@@ -78,4 +79,33 @@ void MainCharacter::updateBoundingSize()
 		boundingSize = h;
 	else
 		boundingSize = w;
+}
+
+void MainCharacter::walks(float dt)
+{
+	walkSpeed = 200.0f;
+
+	if(stamina < 100.0f)
+		stamina += 20.0f * dt;
+}
+
+void MainCharacter::runs(float dt)
+{
+	if (stamina > 0)
+	{
+		walkSpeed = 400.0f;
+		stamina -= 30.0f * dt;
+	}
+	else
+		walkSpeed = 200.0f;
+}
+
+float MainCharacter::getStamina()
+{
+	return stamina;
+}
+
+float MainCharacter::getWalkSpeed()
+{
+	return walkSpeed;
 }
