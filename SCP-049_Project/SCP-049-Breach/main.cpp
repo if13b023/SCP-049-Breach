@@ -109,6 +109,7 @@ int main(int argc, char* argv)
 
 	//Creating Zombies
 	Zombies zombies;
+	zombies.setTexture("tex/Zombie_01.png");
 	zombies.addZombie();
 	//*** cz
 

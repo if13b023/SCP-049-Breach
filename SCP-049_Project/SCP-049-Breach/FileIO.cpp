@@ -71,13 +71,13 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shar
 	{
 		std::getline(file, tmp);
 		//std::cout << tmp << std::endl;
-		std::cout << "nothing found...\n";
+		//std::cout << "nothing found...\n";
 	} while (tmp.compare("start") != 0 && !file.eof());
 
 	if (tmp.compare("start") == 0)
 	{
 		list.clear();
-		std::cout << "start found!\n";
+		//std::cout << "start found!\n";
 	}
 	else
 	{
@@ -100,19 +100,19 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shar
 			//index++;
 			index = list.size();
 			pnt_cnt = 0;
-			std::cout << "*** new light shape ***\nid = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
+			//std::cout << "*** new light shape ***\nid = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
 			list.push_back(std::make_shared<ltbl::LightShape>());
 			std::getline(file, tmp, '\n');
 			pos = tmp.find(':');
-			std::cout << "origin: x = " << tmp.substr(0, pos) << "\ty = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
+			//std::cout << "origin: x = " << tmp.substr(0, pos) << "\ty = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
 			list.at(index)->_shape.setPosition( std::stof(tmp.substr(0, pos)), std::stof(tmp.substr(pos + 1, tmp.length() - pos)));
 			std::getline(file, tmp, '\n');
-			std::cout << "# of point = " << tmp << std::endl;
+			//std::cout << "# of point = " << tmp << std::endl;
 			list.at(index)->_shape.setPointCount(std::stoi(tmp));
 		}
 		else
 		{
-			std::cout << "x = " << tmp.substr(0, pos) << "\ty = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
+			//std::cout << "x = " << tmp.substr(0, pos) << "\ty = " << tmp.substr(pos + 1, tmp.length() - pos) << std::endl;
 			list.at(index)->_shape.setPoint(pnt_cnt, sf::Vector2f(std::stof(tmp.substr(0, pos)), std::stof(tmp.substr(pos + 1, tmp.length() - pos))));
 			pnt_cnt++;
 		}

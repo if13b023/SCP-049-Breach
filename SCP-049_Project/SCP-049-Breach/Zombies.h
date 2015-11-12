@@ -1,6 +1,7 @@
 #pragma once
-#include "Character.h"
+#include "Zombie.h"
 #include "SFML\Graphics.hpp"
+#include <iostream>
 
 class Zombies
 {
@@ -9,14 +10,14 @@ public:
 	~Zombies();
 
 	int addZombie();
-	Character getZombie(int);
+	Zombie getZombie(int);
 
 	int count();
 
 	void setTexture(const char*);
 
 private:
-	std::vector<Character> m_list;
+	std::vector<Zombie> m_list;
 	sf::Texture m_tex;
 	sf::Sprite m_sprite;
 };
