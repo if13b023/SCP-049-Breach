@@ -1,11 +1,11 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 
-class MainCharacter
+class Character
 {
 public:
-	MainCharacter();
-	~MainCharacter();
+	Character();
+	~Character();
 
 	bool setSprite(const char*);
 	bool setSprite(sf::Texture);

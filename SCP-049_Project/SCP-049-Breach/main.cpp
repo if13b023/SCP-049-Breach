@@ -11,7 +11,8 @@
 
 #include "LightShapeMaker.h"
 #include "FileIO.h"
-#include "MainCharacter.h"
+#include "Character.h"
+#include "Zombies.h"
 
 bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
 {
@@ -37,7 +38,7 @@ int main(int argc, char* argv)
 	for (int i = 0; i < argc; i++)
 		std::cout << argv[i] << std::endl;
 	//***
-
+	
 	//INIT
 	sf::VideoMode vm;
 	vm.width = 1280;
@@ -97,7 +98,7 @@ int main(int argc, char* argv)
 	sf::Sprite characterSprite(characterTex);
 	characterSprite.setOrigin(characterTex.getSize().x / 2, (characterTex.getSize().y / 2));
 	characterSprite.setScale(0.15, 0.15);*/
-	MainCharacter mainChar;
+	Character mainChar;
 	if (!mainChar.setSprite("tex/Sprite_01.png"))
 	{
 		std::cout << "Couldn't load \"tex / Sprite_01.png\"." << std::endl;
@@ -106,10 +107,22 @@ int main(int argc, char* argv)
 	mainChar.setScale(0.15f);
 	//***	loading Textures and creating Sprites
 
+	//Creating Zombies
+	Zombies zombies;
+	zombies.addZombie();
+	//*** cz
+
+	//Creating CharacterList
+	std::vector<Character*> c_list;
+	c_list.push_back(&mainChar);
+	for (int i = 0; i < zombies.count(); ++i)
+		c_list.push_back(&zombies.getZombie(i));
+	//*** cl
+
 	//LightSystem
 	ltbl::LightSystem ls;
 	sf::Color ambientColor = sf::Color(100, 100, 100, 255);
-	ls.create(sf::FloatRect(-1000.0f, -1000.0f, 1000.0f, 1000.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
+	ls.create(sf::FloatRect(-10.0f, -10.0f, 10.0f, 10.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
 	ls._ambientColor = ambientColor;
 
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
@@ -137,12 +150,13 @@ int main(int argc, char* argv)
 	int cnt = 0;
 
 	sf::View view = window.getDefaultView();
+	float zoomFactor = 1.0f;
 	view.zoom(0.5f);
 	mainChar.setPosition(view.getCenter());
 	FileWriter fw;
 	bool show_fps = false;
 
-	window.setVerticalSyncEnabled(true);
+	window.setVerticalSyncEnabled(false);
 
 	fw.LoadLightShapesFromFile("data/Level1_2_big.jpg.txt", lightShapes, ls);
 	//***	INIT END
@@ -165,11 +179,16 @@ int main(int argc, char* argv)
 			{
 				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
 
-				if (eve.mouseWheelScroll.delta < 0 && ViewportLock(view, bgSprite.getPosition()))
+				if (eve.mouseWheelScroll.delta < 0 && zoomFactor < 2.0f)
+				{
+					zoomFactor += 0.1f;
 					view.zoom(1.1f);
-
-				if (eve.mouseWheelScroll.delta > 0)
+				}
+				else if (eve.mouseWheelScroll.delta > 0 && zoomFactor > 0.5f)
+				{
+					zoomFactor -= 0.1f;
 					view.zoom(0.9f);
+				}
 				break;
 			}
 
@@ -239,15 +258,24 @@ int main(int argc, char* argv)
 
 		//CollisionDetection
 		mainChar.move(moveVec);
-		for (int i = 0; i < lightShapes.size(); ++i)
-		{
-			if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()) || !bgSprite.getGlobalBounds().contains(mainChar.getPosition()))
+		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
+		float border = 30.0f;
+		bgBounds.height -= border;
+		bgBounds.width -= border;
+		bgBounds.left += border;
+		bgBounds.top += border;
+		if(!bgBounds.contains(mainChar.getPosition()))
+			mainChar.move(-moveVec);
+		else
+			for (int i = 0; i < lightShapes.size(); ++i)
 			{
-				//std::cout << "Collision!" << dt << std::endl;
-				mainChar.move(-moveVec);
-				//view.move(-moveVec);
+				if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()))
+				{
+					//std::cout << "Collision!" << dt << std::endl;
+					mainChar.move(-moveVec);
+					//view.move(-moveVec);
+				}
 			}
-		}
 		//*** CD
 
 		view.setCenter(mainChar.getPosition());
@@ -264,7 +292,9 @@ int main(int argc, char* argv)
 
 		window.draw(bgSprite);
 
-		window.draw(mainChar.getSprite());
+		for (int i = 0; i < c_list.size(); ++i)
+			window.draw(c_list.at(i)->getSprite());
+		//window.draw(mainChar.getSprite());
 
 		window.draw(bgTopSprite);
 

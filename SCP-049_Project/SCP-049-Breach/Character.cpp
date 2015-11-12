@@ -1,8 +1,8 @@
-#include "MainCharacter.h"
+#include "Character.h"
 
 
 
-MainCharacter::MainCharacter()
+Character::Character()
 	:	health(100),
 		position(0, 0),
 		walkSpeed(200.0f),
@@ -10,12 +10,12 @@ MainCharacter::MainCharacter()
 {
 }
 
-MainCharacter::~MainCharacter()
+Character::~Character()
 {
 
 }
 
-bool MainCharacter::setSprite(const char* path)
+bool Character::setSprite(const char* path)
 {
 	if (!m_texture.loadFromFile(path))
 		return false;
@@ -31,46 +31,61 @@ bool MainCharacter::setSprite(const char* path)
 	return true;
 }
 
-sf::Vector2f MainCharacter::getPosition()
+bool Character::setSprite(sf::Texture tex)
+{
+	m_texture = tex;
+	m_texture.setRepeated(false);
+
+	m_sprite.setTexture(m_texture);
+	m_sprite.setTextureRect(sf::IntRect(0, 0, m_texture.getSize().x, m_texture.getSize().y));
+	m_sprite.setOrigin(m_texture.getSize().x / 2.0f, (m_texture.getSize().y / 2.0f));
+	m_sprite.setPosition(position);
+
+	updateBoundingSize();
+
+	return true;
+}
+
+sf::Vector2f Character::getPosition()
 {
 	return position;
 }
 
-void MainCharacter::setPosition(sf::Vector2f InPos)
+void Character::setPosition(sf::Vector2f InPos)
 {
 	position = InPos;
 	m_sprite.setPosition(position);
 }
 
-void MainCharacter::setRotation(float angle)
+void Character::setRotation(float angle)
 {
 	m_sprite.setRotation(angle);
 }
 
-sf::Sprite MainCharacter::getSprite()
+sf::Sprite Character::getSprite()
 {
 	return m_sprite;
 }
 
-void MainCharacter::setScale(float s)
+void Character::setScale(float s)
 {
 	m_sprite.setScale(s, s);
 	updateBoundingSize();
 }
 
-void MainCharacter::move(sf::Vector2f moveV)
+void Character::move(sf::Vector2f moveV)
 {
 	position += moveV;
 	m_sprite.setPosition(position);
 }
 
-sf::FloatRect MainCharacter::getBoundingBox()
+sf::FloatRect Character::getBoundingBox()
 {
 	sf::Vector2f halfSize(boundingSize*0.5f, boundingSize*0.5f);
 	return sf::FloatRect(position-halfSize, sf::Vector2f(boundingSize, boundingSize));
 }
 
-void MainCharacter::updateBoundingSize()
+void Character::updateBoundingSize()
 {
 	float	h = m_sprite.getLocalBounds().height * m_sprite.getScale().x,
 		w = m_sprite.getLocalBounds().width * m_sprite.getScale().x;
@@ -81,7 +96,7 @@ void MainCharacter::updateBoundingSize()
 		boundingSize = w;
 }
 
-void MainCharacter::walks(float dt)
+void Character::walks(float dt)
 {
 	walkSpeed = 200.0f;
 
@@ -89,7 +104,7 @@ void MainCharacter::walks(float dt)
 		stamina += 20.0f * dt;
 }
 
-void MainCharacter::runs(float dt)
+void Character::runs(float dt)
 {
 	if (stamina > 0)
 	{
@@ -100,12 +115,12 @@ void MainCharacter::runs(float dt)
 		walkSpeed = 200.0f;
 }
 
-float MainCharacter::getStamina()
+float Character::getStamina()
 {
 	return stamina;
 }
 
-float MainCharacter::getWalkSpeed()
+float Character::getWalkSpeed()
 {
 	return walkSpeed;
 }

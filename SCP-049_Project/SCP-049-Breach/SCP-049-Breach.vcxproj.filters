@@ -63,7 +63,13 @@
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp">
       <Filter>ltbl</Filter>
     </ClCompile>
-    <ClCompile Include="MainCharacter.cpp">
+    <ClCompile Include="Character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Zombies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Zombie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,7 +116,13 @@
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h">
       <Filter>ltbl</Filter>
     </ClInclude>
-    <ClInclude Include="MainCharacter.h">
+    <ClInclude Include="Character.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Zombies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Zombie.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

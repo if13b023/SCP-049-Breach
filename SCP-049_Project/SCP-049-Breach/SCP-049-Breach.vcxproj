@@ -134,12 +134,14 @@
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.cpp" />
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.cpp" />
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp" />
+    <ClCompile Include="Zombie.cpp" />
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="LightShapeMaker.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainCharacter.cpp" />
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Zombies.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.h" />
@@ -152,11 +154,13 @@
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.h" />
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.h" />
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h" />
+    <ClInclude Include="Zombie.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="LightShapeMaker.h" />
-    <ClInclude Include="MainCharacter.h" />
+    <ClInclude Include="Character.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Zombies.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
