@@ -12,7 +12,9 @@
 #include "LightShapeMaker.h"
 #include "FileIO.h"
 #include "Character.h"
-#include "Zombies.h"
+#include "Zombie.h"
+
+#include "normalize.h"
 
 bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
 {
@@ -21,15 +23,6 @@ bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
 	//if ((v.left <= pos.x) || (v.top <= pos.y))
 	//	return false;
 	return true;
-}
-
-sf::Vector2f normalize(const sf::Vector2f& source)
-{
-	float length = sqrt((source.x * source.x) + (source.y * source.y));
-	if (length != 0)
-		return sf::Vector2f(source.x / length, source.y / length);
-	else
-		return source;
 }
 
 int main(int argc, char* argv)
@@ -92,6 +85,27 @@ int main(int argc, char* argv)
 	flashLightTex.loadFromFile("resources/flashlightTexture_g.png");
 	flashLightTex.setSmooth(true);
 
+	//LightSystem
+	ltbl::LightSystem ls;
+	sf::Color ambientColor = sf::Color(100, 100, 100, 255);
+	ls.create(sf::FloatRect(-10.0f, -10.0f, 10.0f, 10.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
+	ls._ambientColor = ambientColor;
+
+	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
+
+	light->_emissionSprite.setOrigin(sf::Vector2f(10.0f, 10.0f));
+	light->_emissionSprite.setTexture(flashLightTex);
+	light->_emissionSprite.setScale(sf::Vector2f(1.5f, 1.5f));
+	light->_emissionSprite.setColor(sf::Color(200, 200, 200));
+	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
+
+	ls.addLight(light);
+
+	std::vector<std::shared_ptr<ltbl::LightShape>> lightShapes;
+
+	LightShapeMaker lsm;
+	//***	LightSystem
+
 	/*sf::Texture characterTex;
 	characterTex.loadFromFile("tex/Sprite_01.png");
 
@@ -118,12 +132,12 @@ int main(int argc, char* argv)
 
 	//Creating Zombies
 	//Zombies zombies;
-	std::vector<Character> zombies;
+	std::vector<Zombie> zombies;
 	/*if (!zombies.setTexture("tex/Zombie_01.png"))
 	{
 		std::cout << "Couldn't load \"tex / Zombie_01.png\"" << std::endl;
 	}*/
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		z.setPosition(z.getPosition() + sf::Vector2f(z.getSprite().getGlobalBounds().width, 0));
 		zombies.push_back(z);
@@ -131,34 +145,15 @@ int main(int argc, char* argv)
 	//*** cz
 
 	//Creating CharacterList
-	std::vector<Character*> z_list;
+	std::vector<Zombie*> z_list;
 	//z_list.push_back(&mainChar);
 	//for (int i = 0; i < zombies.count(); ++i)
 	//	z_list.push_back(&zombies.getZombie(i));
 	for (int i = 0; i < zombies.size(); ++i)
+	{
 		z_list.push_back(&zombies.at(i));
+	}
 	//*** cl
-
-	//LightSystem
-	ltbl::LightSystem ls;
-	sf::Color ambientColor = sf::Color(100, 100, 100, 255);
-	ls.create(sf::FloatRect(-10.0f, -10.0f, 10.0f, 10.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
-	ls._ambientColor = ambientColor;
-
-	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
-
-	light->_emissionSprite.setOrigin(sf::Vector2f(10.0f, 10.0f));
-	light->_emissionSprite.setTexture(flashLightTex);
-	light->_emissionSprite.setScale(sf::Vector2f(1.5f, 1.5f));
-	light->_emissionSprite.setColor(sf::Color(200, 200, 200));
-	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
-
-	ls.addLight(light);
-
-	std::vector<std::shared_ptr<ltbl::LightShape>> lightShapes;
-
-	LightShapeMaker lsm;
-	//***	LightSystem
 
 	sf::Event eve;
 
@@ -276,7 +271,16 @@ int main(int argc, char* argv)
 
 		//view.move(moveVec);
 
+		//AI
+		for (int i = 0; i < zombies.size(); ++i)
+		{
+			sf::Vector2f zmov = zombies.at(i).think(mainChar.getPosition());
+			zombies.at(i).move(zmov * dt * zombies.at(i).getWalkSpeed());
+		}
+		//*** ai
+
 		//CollisionDetection
+		bool collided = false;
 		mainChar.move(moveVec);
 		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
 		float border = 30.0f;
@@ -287,15 +291,24 @@ int main(int argc, char* argv)
 		if(!bgBounds.contains(mainChar.getPosition()))
 			mainChar.move(-moveVec);
 		else
+		{
 			for (int i = 0; i < lightShapes.size(); ++i)
 			{
 				if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()))
 				{
 					//std::cout << "Collision!" << dt << std::endl;
 					mainChar.move(-moveVec);
+					collided = true;
 					//view.move(-moveVec);
 				}
 			}
+
+			for (int i = 0; i < zombies.size() && !collided; ++i)
+			{
+				if (mainChar.getBoundingBox().intersects(zombies.at(i).getBoundingBox()))
+					mainChar.move(-moveVec);
+			}
+		}
 		//*** CD
 
 		view.setCenter(mainChar.getPosition());

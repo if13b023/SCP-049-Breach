@@ -134,6 +134,7 @@
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.cpp" />
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.cpp" />
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp" />
+    <ClCompile Include="normalize.cpp" />
     <ClCompile Include="Zombie.cpp" />
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeNode.h" />
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\QuadtreeOccupant.h" />
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h" />
+    <ClInclude Include="normalize.h" />
     <ClInclude Include="Zombie.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="GameObject.h" />

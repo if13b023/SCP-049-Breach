@@ -31,7 +31,7 @@ public:
 
 	void move(sf::Vector2f);
 
-private:
+protected:
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
 	sf::Vector2f position;
