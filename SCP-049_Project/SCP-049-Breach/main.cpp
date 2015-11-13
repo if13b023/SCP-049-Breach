@@ -105,19 +105,38 @@ int main(int argc, char* argv)
 		return 1;
 	}
 	mainChar.setScale(0.15f);
+
+	Zombie z;
+	if (!z.setSprite("tex/Zombie_01.png"))
+	{
+		std::cout << "Couldn't load \"tex / Sprite_01.png\"." << std::endl;
+		return 1;
+	}
+	z.setScale(0.15f);
+	z.setPosition(100.0f, 100.0f);
 	//***	loading Textures and creating Sprites
 
 	//Creating Zombies
-	Zombies zombies;
-	zombies.setTexture("tex/Zombie_01.png");
-	zombies.addZombie();
+	//Zombies zombies;
+	std::vector<Character> zombies;
+	/*if (!zombies.setTexture("tex/Zombie_01.png"))
+	{
+		std::cout << "Couldn't load \"tex / Zombie_01.png\"" << std::endl;
+	}*/
+	for (int i = 0; i < 10; ++i)
+	{
+		z.setPosition(z.getPosition() + sf::Vector2f(z.getSprite().getGlobalBounds().width, 0));
+		zombies.push_back(z);
+	}
 	//*** cz
 
 	//Creating CharacterList
-	std::vector<Character*> c_list;
-	c_list.push_back(&mainChar);
-	for (int i = 0; i < zombies.count(); ++i)
-		c_list.push_back(&zombies.getZombie(i));
+	std::vector<Character*> z_list;
+	//z_list.push_back(&mainChar);
+	//for (int i = 0; i < zombies.count(); ++i)
+	//	z_list.push_back(&zombies.getZombie(i));
+	for (int i = 0; i < zombies.size(); ++i)
+		z_list.push_back(&zombies.at(i));
 	//*** cl
 
 	//LightSystem
@@ -293,9 +312,9 @@ int main(int argc, char* argv)
 
 		window.draw(bgSprite);
 
-		for (int i = 0; i < c_list.size(); ++i)
-			window.draw(c_list.at(i)->getSprite());
-		//window.draw(mainChar.getSprite());
+		for (int i = 0; i < z_list.size(); ++i)
+			window.draw(z_list.at(i)->getSprite());
+		window.draw(mainChar.getSprite());
 
 		window.draw(bgTopSprite);
 

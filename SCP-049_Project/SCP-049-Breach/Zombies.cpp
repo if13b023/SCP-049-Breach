@@ -11,12 +11,20 @@ Zombies::~Zombies()
 {
 }
 
-void Zombies::setTexture(const char* path)
+bool Zombies::setTexture(const char* path)
 {
 	if (!m_tex.loadFromFile(path))
-		std::cout << "Couldn't load " << path << std::endl;
+		return false;
 	m_tex.setRepeated(false);
 	m_sprite.setTexture(m_tex);
+	return true;
+}
+
+bool Zombies::setTexture(sf::Texture tx)
+{
+	m_tex = tx;
+	m_sprite.setTexture(m_tex);
+	return true;
 }
 
 int Zombies::addZombie()

@@ -14,7 +14,8 @@ public:
 
 	int count();
 
-	void setTexture(const char*);
+	bool setTexture(const char*);
+	bool setTexture(sf::Texture);
 
 private:
 	std::vector<Zombie> m_list;

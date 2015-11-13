@@ -8,12 +8,13 @@ public:
 	~Character();
 
 	bool setSprite(const char*);
-	bool setSprite(sf::Texture);
+	bool setSprite(sf::Texture&);
 	bool setSprite(sf::Sprite);
 	sf::Sprite getSprite();
 
 	sf::Vector2f getPosition();
 	void setPosition(sf::Vector2f);
+	void setPosition(float, float);
 
 	sf::Vector2f getRotation();
 	void setRotation(float);

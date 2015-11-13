@@ -31,7 +31,7 @@ bool Character::setSprite(const char* path)
 	return true;
 }
 
-bool Character::setSprite(sf::Texture tex)
+bool Character::setSprite(sf::Texture& tex)
 {
 	m_texture = tex;
 	m_texture.setRepeated(false);
@@ -54,6 +54,12 @@ sf::Vector2f Character::getPosition()
 void Character::setPosition(sf::Vector2f InPos)
 {
 	position = InPos;
+	m_sprite.setPosition(position);
+}
+
+void Character::setPosition(float x, float y)
+{
+	position = sf::Vector2f(x, y);
 	m_sprite.setPosition(position);
 }
 
