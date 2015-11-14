@@ -9,10 +9,10 @@ public:
 	Zombies();
 	~Zombies();
 
-	int addZombie();
+	size_t addZombie();
 	Zombie getZombie(int);
 
-	int count();
+	size_t count();
 
 	bool setTexture(const char*);
 	bool setTexture(sf::Texture);

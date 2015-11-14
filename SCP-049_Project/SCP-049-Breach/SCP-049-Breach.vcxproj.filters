@@ -16,6 +16,9 @@
     <Filter Include="ltbl">
       <UniqueIdentifier>{9028a20d-e69a-4a91-b724-f566f44e4549}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Unused">
+      <UniqueIdentifier>{c7ec826b-9ce6-4710-ac5e-690f10675344}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,13 +27,7 @@
     <ClCompile Include="Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FileIO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LightShapeMaker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.cpp">
@@ -66,13 +63,22 @@
     <ClCompile Include="Character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Zombies.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Zombie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="normalize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Zombies.cpp">
+      <Filter>Unused</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShapeMaker.cpp">
+      <Filter>Unused</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Unused</Filter>
+    </ClCompile>
+    <ClCompile Include="MainCharacter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,13 +86,7 @@
     <ClInclude Include="Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FileIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightShapeMaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\lighting\LightDirectionEmission.h">
@@ -122,13 +122,22 @@
     <ClInclude Include="Character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Zombies.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Zombie.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="normalize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Zombies.h">
+      <Filter>Unused</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Unused</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShapeMaker.h">
+      <Filter>Unused</Filter>
+    </ClInclude>
+    <ClInclude Include="MainCharacter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

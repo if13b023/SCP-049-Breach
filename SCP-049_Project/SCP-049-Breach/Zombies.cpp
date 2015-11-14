@@ -27,7 +27,7 @@ bool Zombies::setTexture(sf::Texture tx)
 	return true;
 }
 
-int Zombies::addZombie()
+size_t Zombies::addZombie()
 {
 	Zombie z;
 	z.setSprite(m_tex);
@@ -39,7 +39,7 @@ int Zombies::addZombie()
 	return m_list.size() - 1;
 }
 
-int Zombies::count()
+size_t Zombies::count()
 {
 	return m_list.size();
 }

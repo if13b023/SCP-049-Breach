@@ -7,6 +7,8 @@ public:
 	Character();
 	~Character();
 
+	enum charState { Idle, Walk, Run };
+
 	bool setSprite(const char*);
 	bool setSprite(sf::Texture&);
 	bool setSprite(sf::Sprite);
@@ -22,16 +24,18 @@ public:
 	void setScale(float);
 
 	float getStamina();
-	float getWalkSpeed();
+	float getWalkSpeed(float dt = 1.0f);
 
 	void runs(float);
 	void walks(float);
+	void setState(charState);
 
 	sf::FloatRect getBoundingBox();
 
 	void move(sf::Vector2f);
 
 protected:
+	charState m_state;
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
 	sf::Vector2f position;

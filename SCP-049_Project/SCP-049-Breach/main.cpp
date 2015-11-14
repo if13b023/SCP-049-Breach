@@ -9,10 +9,10 @@
 #include <iostream>
 #include <thread>
 
-#include "LightShapeMaker.h"
 #include "FileIO.h"
 #include "Character.h"
 #include "Zombie.h"
+#include "MainCharacter.h"
 
 #include "normalize.h"
 
@@ -91,20 +91,21 @@ int main(int argc, char* argv)
 	ls.create(sf::FloatRect(-10.0f, -10.0f, 10.0f, 10.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
 	ls._ambientColor = ambientColor;
 
+	std::vector<std::shared_ptr<ltbl::LightShape>> lightShapes;
+	lightShapes.reserve(256);
+	//***	LightSystem
+
+	//Flashlight
 	std::shared_ptr<ltbl::LightPointEmission> light = std::make_shared<ltbl::LightPointEmission>();
 
 	light->_emissionSprite.setOrigin(sf::Vector2f(10.0f, 10.0f));
 	light->_emissionSprite.setTexture(flashLightTex);
 	light->_emissionSprite.setScale(sf::Vector2f(1.5f, 1.5f));
-	light->_emissionSprite.setColor(sf::Color(200, 200, 200));
+	light->_emissionSprite.setColor(sf::Color::White);
 	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
 	ls.addLight(light);
-
-	std::vector<std::shared_ptr<ltbl::LightShape>> lightShapes;
-
-	LightShapeMaker lsm;
-	//***	LightSystem
+	//** fl
 
 	/*sf::Texture characterTex;
 	characterTex.loadFromFile("tex/Sprite_01.png");
@@ -112,13 +113,14 @@ int main(int argc, char* argv)
 	sf::Sprite characterSprite(characterTex);
 	characterSprite.setOrigin(characterTex.getSize().x / 2, (characterTex.getSize().y / 2));
 	characterSprite.setScale(0.15, 0.15);*/
-	Character mainChar;
+	MainCharacter mainChar;
 	if (!mainChar.setSprite("tex/Sprite_01.png"))
 	{
 		std::cout << "Couldn't load \"tex / Sprite_01.png\"." << std::endl;
 		return 1;
 	}
 	mainChar.setScale(0.15f);
+	mainChar.setFlashlight(light);
 
 	Zombie z;
 	if (!z.setSprite("tex/Zombie_01.png"))
@@ -133,26 +135,28 @@ int main(int argc, char* argv)
 	//Creating Zombies
 	//Zombies zombies;
 	std::vector<Zombie> zombies;
+	zombies.reserve(16);
 	/*if (!zombies.setTexture("tex/Zombie_01.png"))
 	{
 		std::cout << "Couldn't load \"tex / Zombie_01.png\"" << std::endl;
 	}*/
 	for (int i = 0; i < 3; ++i)
 	{
-		z.setPosition(z.getPosition() + sf::Vector2f(z.getSprite().getGlobalBounds().width, 0));
+		z.setPosition(z.getPosition() + sf::Vector2f(z.getSprite().getGlobalBounds().width + 50.0f , 0));
 		zombies.push_back(z);
 	}
 	//*** cz
 
 	//Creating CharacterList
-	std::vector<Zombie*> z_list;
+	/*std::vector<Zombie*> z_list;
+	z_list.reserve(16);
 	//z_list.push_back(&mainChar);
 	//for (int i = 0; i < zombies.count(); ++i)
 	//	z_list.push_back(&zombies.getZombie(i));
 	for (int i = 0; i < zombies.size(); ++i)
 	{
 		z_list.push_back(&zombies.at(i));
-	}
+	}*/
 	//*** cl
 
 	sf::Event eve;
@@ -197,12 +201,12 @@ int main(int argc, char* argv)
 				if (eve.mouseWheelScroll.delta < 0 && zoomFactor < 2.0f)
 				{
 					zoomFactor += 0.1f;
-					view.zoom(1.1f);
+					view.zoom(1.05f);
 				}
 				else if (eve.mouseWheelScroll.delta > 0 && zoomFactor > 0.5f)
 				{
 					zoomFactor -= 0.1f;
-					view.zoom(0.9f);
+					view.zoom(0.95f);
 				}
 				break;
 			}
@@ -211,25 +215,11 @@ int main(int argc, char* argv)
 			{
 				if (eve.mouseButton.button == sf::Mouse::Left)
 				{
-					/*int index = lsm.addHexToList(lightShapes, mousePos);
-					std::cout << "mouse x_y: " << mousePos.x << "_" << mousePos.y << "; index = " << lightShapes.size() << std::endl;
-					ls.addShape(lightShapes.at(index));*/
-					if (!lsm.isActive())
-					{
-						lsm.begin(lightShapes, 64);
-						lsm.setPosition(mousePos);
-					}
-					else
-						lsm.addPoint(mousePos);
+					mainChar.toogleFlashlight();
 				}
 				else if (eve.mouseButton.button == sf::Mouse::Right)
 				{
-					if (lsm.isActive())
-					{
-						size_t index = lsm.finish();
-						if (index != -1)
-							ls.addShape(lightShapes.at(index));
-					}
+
 				}
 				break;
 			}
@@ -251,9 +241,9 @@ int main(int argc, char* argv)
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-			mainChar.runs(dt);
+			mainChar.setState(Character::Run);
 		else
-			mainChar.walks(dt);
+			mainChar.setState(Character::Walk);
 
 		sf::Vector2f moveVec;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -267,19 +257,11 @@ int main(int argc, char* argv)
 			moveVec.y = 1.0f;
 
 		moveVec = normalize(moveVec);
-		moveVec *= (mainChar.getWalkSpeed() * dt);
+		moveVec *= (mainChar.getWalkSpeed(dt));
 
 		//view.move(moveVec);
 
-		//AI
-		for (int i = 0; i < zombies.size(); ++i)
-		{
-			sf::Vector2f zmov = zombies.at(i).think(mainChar.getPosition());
-			zombies.at(i).move(zmov * dt * zombies.at(i).getWalkSpeed());
-		}
-		//*** ai
-
-		//CollisionDetection
+		//MainCharacter CollisionDetection
 		bool collided = false;
 		mainChar.move(moveVec);
 		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
@@ -299,7 +281,6 @@ int main(int argc, char* argv)
 					//std::cout << "Collision!" << dt << std::endl;
 					mainChar.move(-moveVec);
 					collided = true;
-					//view.move(-moveVec);
 				}
 			}
 
@@ -309,15 +290,41 @@ int main(int argc, char* argv)
 					mainChar.move(-moveVec);
 			}
 		}
-		//*** CD
+		//*** mccd
+
+		//AI
+		collided = false;
+		for (int i = 0; i < zombies.size(); ++i)
+		{
+			collided = false;
+			sf::Vector2f zmov = zombies.at(i).think(mainChar.getPosition()) * dt * zombies.at(i).getWalkSpeed();
+			//zombies.at(i).move(zmov);
+			for (int l = 0; l < lightShapes.size(); ++l)
+			{
+				if (zombies.at(i).getBoundingBox().intersects(lightShapes[l]->_shape.getGlobalBounds()))
+				{
+					//std::cout << "Collision!" << dt << std::endl;
+					zombies.at(i).move(-zmov);
+					collided = true;
+					//view.move(-moveVec);
+				}
+
+				for (int j = 0; j < zombies.size() && !collided; ++j)
+				{
+					if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
+						zombies.at(i).move(-zmov);
+				}
+			}
+		}
+		//*** ai
 
 		view.setCenter(mainChar.getPosition());
-		light->_emissionSprite.setPosition(mainChar.getPosition());
 
 		//Flashlight Rotation
 		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
 		light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
 		mainChar.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
+		//** fr
 
 		window.clear();
 
@@ -325,8 +332,8 @@ int main(int argc, char* argv)
 
 		window.draw(bgSprite);
 
-		for (int i = 0; i < z_list.size(); ++i)
-			window.draw(z_list.at(i)->getSprite());
+		for (int i = 0; i < zombies.size(); ++i)
+			window.draw(zombies.at(i).getSprite());
 		window.draw(mainChar.getSprite());
 
 		window.draw(bgTopSprite);
@@ -347,7 +354,7 @@ int main(int argc, char* argv)
 		dt = clock.getElapsedTime().asSeconds();
 
 		cnt++;
-		if (cnt % 10 == 0 && show_fps)
+		if (cnt % 100 == 0 && show_fps)
 		{
 			std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << " - " << mainChar.getStamina() << std::endl;
 			cnt = 0;

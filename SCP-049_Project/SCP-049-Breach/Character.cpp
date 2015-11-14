@@ -1,12 +1,11 @@
 #include "Character.h"
 
-
-
 Character::Character()
 	:	health(100),
 		position(0, 0),
 		walkSpeed(200.0f),
-		stamina(100.0f)
+		stamina(100.0f),
+		m_state(Character::Walk)
 {
 }
 
@@ -102,31 +101,35 @@ void Character::updateBoundingSize()
 		boundingSize = w;
 }
 
-void Character::walks(float dt)
-{
-	walkSpeed = 200.0f;
-
-	if(stamina < 100.0f)
-		stamina += 20.0f * dt;
-}
-
-void Character::runs(float dt)
-{
-	if (stamina > 0)
-	{
-		walkSpeed = 400.0f;
-		stamina -= 30.0f * dt;
-	}
-	else
-		walkSpeed = 200.0f;
-}
-
 float Character::getStamina()
 {
 	return stamina;
 }
 
-float Character::getWalkSpeed()
+float Character::getWalkSpeed(float dt)
 {
-	return walkSpeed;
+	switch (m_state)
+	{
+	case Character::Walk:
+			if (stamina < 100.0f)
+				stamina += 10.0f * dt;
+			return 200.0f * dt;
+		break;
+	case Character::Run:
+			if (stamina > 0)
+			{
+				stamina -= 30.0f * dt;
+				return 400.0f * dt;
+			}
+			else
+				return 200.0f * dt;
+		break;
+	}
+
+	return 0;
+}
+
+void Character::setState(charState newState)
+{
+	m_state = newState;
 }
