@@ -1,5 +1,8 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <ltbl\lighting\LightShape.h>
+#include <vector>
+#include "normalize.h"
 
 class Character
 {
@@ -18,7 +21,7 @@ public:
 	void setPosition(sf::Vector2f);
 	void setPosition(float, float);
 
-	sf::Vector2f getRotation();
+	float getRotation();
 	void setRotation(float);
 
 	void setScale(float);
@@ -26,19 +29,21 @@ public:
 	float getStamina();
 	float getWalkSpeed(float dt = 1.0f);
 
-	void runs(float);
-	void walks(float);
 	void setState(charState);
 
 	sf::FloatRect getBoundingBox();
 
-	void move(sf::Vector2f);
+	void move(sf::Vector2f, float);
+
+	bool collide(std::vector<std::shared_ptr<ltbl::LightShape>>&);
+	bool collide(std::vector<Character>&);
 
 protected:
 	charState m_state;
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
 	sf::Vector2f position;
+	sf::Vector2f direction;
 	float boundingSize;
 	float stamina;
 	float health;

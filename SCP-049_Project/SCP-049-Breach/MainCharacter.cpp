@@ -37,8 +37,8 @@ bool MainCharacter::getFlashlightSwitch()
 	return m_lightswitch;
 }
 
-void MainCharacter::move(sf::Vector2f pos)
+void MainCharacter::move(sf::Vector2f pos, float dt)
 {
-	Character::move(pos);
+	Character::move(pos, dt);
 	m_flashlight->_emissionSprite.setPosition(position);
 }

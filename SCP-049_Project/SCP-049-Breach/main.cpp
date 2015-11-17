@@ -256,14 +256,11 @@ int main(int argc, char* argv)
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			moveVec.y = 1.0f;
 
-		moveVec = normalize(moveVec);
-		moveVec *= (mainChar.getWalkSpeed(dt));
-
 		//view.move(moveVec);
 
 		//MainCharacter CollisionDetection
 		bool collided = false;
-		mainChar.move(moveVec);
+		mainChar.move(moveVec, dt);
 		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
 		float border = 30.0f;
 		bgBounds.height -= border;
@@ -271,23 +268,32 @@ int main(int argc, char* argv)
 		bgBounds.left += border;
 		bgBounds.top += border;
 		if(!bgBounds.contains(mainChar.getPosition()))
-			mainChar.move(-moveVec);
+			mainChar.move(-moveVec, dt);
 		else
 		{
-			for (int i = 0; i < lightShapes.size(); ++i)
+			/*for (int i = 0; i < lightShapes.size(); ++i)
 			{
 				if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()))
 				{
 					//std::cout << "Collision!" << dt << std::endl;
-					mainChar.move(-moveVec);
+					mainChar.move(-moveVec, dt);
 					collided = true;
 				}
+			}*/
+			if (mainChar.collide(lightShapes))
+			{
+				collided = true;
+				mainChar.move(-moveVec, dt);
 			}
 
+			if (!collided && mainChar.collide(static_cast<std::vector<Character>>(zombies)))
+			{
+
+			}
 			for (int i = 0; i < zombies.size() && !collided; ++i)
 			{
 				if (mainChar.getBoundingBox().intersects(zombies.at(i).getBoundingBox()))
-					mainChar.move(-moveVec);
+					mainChar.move(-moveVec, dt);
 			}
 		}
 		//*** mccd
@@ -304,7 +310,7 @@ int main(int argc, char* argv)
 				if (zombies.at(i).getBoundingBox().intersects(lightShapes[l]->_shape.getGlobalBounds()))
 				{
 					//std::cout << "Collision!" << dt << std::endl;
-					zombies.at(i).move(-zmov);
+					zombies.at(i).move(-zmov, dt);
 					collided = true;
 					//view.move(-moveVec);
 				}
@@ -312,7 +318,7 @@ int main(int argc, char* argv)
 				for (int j = 0; j < zombies.size() && !collided; ++j)
 				{
 					if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
-						zombies.at(i).move(-zmov);
+						zombies.at(i).move(-zmov, dt);
 				}
 			}
 		}

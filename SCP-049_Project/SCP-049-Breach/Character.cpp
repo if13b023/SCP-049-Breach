@@ -62,6 +62,11 @@ void Character::setPosition(float x, float y)
 	m_sprite.setPosition(position);
 }
 
+float Character::getRotation()
+{
+	return m_sprite.getRotation();
+}
+
 void Character::setRotation(float angle)
 {
 	m_sprite.setRotation(angle);
@@ -78,10 +83,37 @@ void Character::setScale(float s)
 	updateBoundingSize();
 }
 
-void Character::move(sf::Vector2f moveV)
+void Character::move(sf::Vector2f moveV, float dt)
 {
-	position += moveV;
+	moveV = normalize(moveV);
+	direction = moveV;
+	position += (moveV*getWalkSpeed(dt));
 	m_sprite.setPosition(position);
+}
+
+bool Character::collide(std::vector<std::shared_ptr<ltbl::LightShape>>& list)
+{
+	
+	for (int i = 0; i < list.size(); ++i)
+	{
+		if (getBoundingBox().intersects(list[i]->_shape.getGlobalBounds()))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Character::collide(std::vector<Character>& list)
+{
+	for (int i = 0; i < list.size(); ++i)
+	{
+		if (getBoundingBox().intersects(list[i].getBoundingBox()))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 sf::FloatRect Character::getBoundingBox()

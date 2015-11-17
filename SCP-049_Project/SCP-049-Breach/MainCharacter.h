@@ -13,7 +13,7 @@ public:
 	bool toogleFlashlight();
 	bool getFlashlightSwitch();
 
-	void move(sf::Vector2f pos);
+	void move(sf::Vector2f pos, float);
 
 private:
 	std::shared_ptr<ltbl::LightPointEmission> m_flashlight;
