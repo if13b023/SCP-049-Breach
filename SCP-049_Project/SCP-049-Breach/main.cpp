@@ -298,7 +298,7 @@ int main(int argc, char* argv)
 		{
 			collided = false;
 			sf::Vector2f zmov = zombies.at(i).think(mainChar.getPosition()) * dt * zombies.at(i).getWalkSpeed();
-			//zombies.at(i).move(zmov);
+			zombies.at(i).move(zmov);
 			for (int l = 0; l < lightShapes.size(); ++l)
 			{
 				if (zombies.at(i).getBoundingBox().intersects(lightShapes[l]->_shape.getGlobalBounds()))
@@ -314,6 +314,9 @@ int main(int argc, char* argv)
 					if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
 						zombies.at(i).move(-zmov);
 				}
+
+				if(zombies.at(i).getBoundingBox().intersects(mainChar.getBoundingBox()) && !collided)
+					zombies.at(i).move(-zmov);
 			}
 		}
 		//*** ai
