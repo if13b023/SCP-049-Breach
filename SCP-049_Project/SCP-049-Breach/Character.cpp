@@ -125,6 +125,30 @@ bool Character::collide(Character& c)
 	return false;
 }
 
+void Character::attack(Character& c)
+{
+	c.damage(m_attackDmg);
+}
+
+bool Character::damage(float dmg)
+{
+	if (health > 0)
+		health -= dmg;
+
+	if (health < 0)
+	{
+		setState(Character::Dead);
+		return false; //Dead
+	}
+
+	return true; //Alive
+}
+
+float Character::getHealth()
+{
+	return health;
+}
+
 sf::FloatRect Character::getBoundingBox()
 {
 	sf::Vector2f halfSize(boundingSize*0.5f, boundingSize*0.5f);
@@ -173,4 +197,9 @@ float Character::getWalkSpeed(float dt)
 void Character::setState(charState newState)
 {
 	m_state = newState;
+}
+
+float Character::getAttackDmg()
+{
+	return m_attackDmg;
 }

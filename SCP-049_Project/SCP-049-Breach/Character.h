@@ -10,7 +10,7 @@ public:
 	Character();
 	~Character();
 
-	enum charState { Idle, Walk, Run };
+	enum charState { Idle, Walk, Run, Dead };
 
 	bool setSprite(const char*);
 	bool setSprite(sf::Texture&);
@@ -31,6 +31,8 @@ public:
 
 	void setState(charState);
 
+	float getAttackDmg();
+
 	sf::FloatRect getBoundingBox();
 
 	void move(sf::Vector2f, float);
@@ -38,6 +40,11 @@ public:
 	bool collide(std::vector<std::shared_ptr<ltbl::LightShape>>&);
 	bool collide(std::vector<Character>&);
 	bool collide(Character&);
+
+	void attack(Character&);
+	bool damage(float);
+
+	float getHealth();
 
 protected:
 	charState m_state;
@@ -49,6 +56,9 @@ protected:
 	float stamina;
 	float health;
 	float walkSpeed;
+	float m_attackDmg;
+	float m_attackSpeed;
+
 	void updateBoundingSize();
 };
 

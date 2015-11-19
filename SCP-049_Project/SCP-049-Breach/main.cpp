@@ -44,7 +44,7 @@ int main(int argc, char* argv)
 	//creating the window
 	sf::RenderWindow window;
 	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
-#define FULLSCREEN 1
+#define FULLSCREEN 0
 #if FULLSCREEN
 	vm.height = 1080;
 	vm.width = 1920;
@@ -84,6 +84,14 @@ int main(int argc, char* argv)
 	sf::Texture flashLightTex;
 	flashLightTex.loadFromFile("resources/flashlightTexture_g.png");
 	flashLightTex.setSmooth(true);
+
+	//GUI
+	sf::Font font;
+	font.loadFromFile("C:/FH/Sem5/GameDev/SCP-049-Breach/SCP-049_Project/x64/Debug/resources/fonts/data-latin.ttf");
+	sf::Text healthBar("Test", font, 50);
+	healthBar.setColor(sf::Color::White);
+	healthBar.setScale(2.0f, 2.0f);
+	//*** gui
 
 	//LightSystem
 	ltbl::LightSystem ls;
@@ -146,18 +154,6 @@ int main(int argc, char* argv)
 		zombies.push_back(z);
 	}
 	//*** cz
-
-	//Creating CharacterList
-	/*std::vector<Zombie*> z_list;
-	z_list.reserve(16);
-	//z_list.push_back(&mainChar);
-	//for (int i = 0; i < zombies.count(); ++i)
-	//	z_list.push_back(&zombies.getZombie(i));
-	for (int i = 0; i < zombies.size(); ++i)
-	{
-		z_list.push_back(&zombies.at(i));
-	}*/
-	//*** cl
 
 	sf::Event eve;
 
@@ -256,8 +252,6 @@ int main(int argc, char* argv)
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			moveVec.y = 1.0f;
 
-		//view.move(moveVec);
-
 		//MainCharacter CollisionDetection
 		bool collided = false;
 		mainChar.move(moveVec, dt);
@@ -271,15 +265,6 @@ int main(int argc, char* argv)
 			mainChar.move(-moveVec, dt);
 		else
 		{
-			/*for (int i = 0; i < lightShapes.size(); ++i)
-			{
-				if (mainChar.getBoundingBox().intersects(lightShapes[i]->_shape.getGlobalBounds()))
-				{
-					//std::cout << "Collision!" << dt << std::endl;
-					mainChar.move(-moveVec, dt);
-					collided = true;
-				}
-			}*/
 			if (mainChar.collide(lightShapes))
 			{
 				collided = true;
@@ -316,23 +301,6 @@ int main(int argc, char* argv)
 
 			if (!collided && zombies.at(i).collide(mainChar))
 				zombies.at(i).move(-zmov, dt);
-			/*for (int l = 0; l < lightShapes.size(); ++l)
->>>>>>> new collide
-			{
-				if (zombies.at(i).getBoundingBox().intersects(lightShapes[l]->_shape.getGlobalBounds()))
-				{
-					//std::cout << "Collision!" << dt << std::endl;
-					zombies.at(i).move(-zmov, dt);
-					collided = true;
-					//view.move(-moveVec);
-				}
-
-				for (int j = 0; j < zombies.size() && !collided; ++j)
-				{
-					if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
-						zombies.at(i).move(-zmov, dt);
-				}
-			}*/
 		}
 		//*** ai
 
@@ -365,6 +333,8 @@ int main(int argc, char* argv)
 
 		window.setView(window.getDefaultView());
 		window.draw(lightSprite, lightRenderStates);
+
+		window.draw(healthBar);
 		window.setView(view);
 
 		window.display();

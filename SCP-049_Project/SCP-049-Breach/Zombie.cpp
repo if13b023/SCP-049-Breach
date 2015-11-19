@@ -3,12 +3,12 @@
 Zombie::Zombie()
 {
 	walkSpeed = 90.0f;
+	m_attackSpeed = 100.0f;
 }
 
 Zombie::~Zombie()
 {
 }
-
 
 sf::Vector2f Zombie::think(Character& main)
 {
