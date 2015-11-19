@@ -37,6 +37,7 @@ public:
 
 	bool collide(std::vector<std::shared_ptr<ltbl::LightShape>>&);
 	bool collide(std::vector<Character>&);
+	bool collide(Character&);
 
 protected:
 	charState m_state;

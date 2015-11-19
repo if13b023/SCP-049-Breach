@@ -44,7 +44,7 @@ int main(int argc, char* argv)
 	//creating the window
 	sf::RenderWindow window;
 	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
-#define FULLSCREEN 0
+#define FULLSCREEN 1
 #if FULLSCREEN
 	vm.height = 1080;
 	vm.width = 1920;
@@ -286,13 +286,9 @@ int main(int argc, char* argv)
 				mainChar.move(-moveVec, dt);
 			}
 
-			if (!collided && mainChar.collide(static_cast<std::vector<Character>>(zombies)))
-			{
-
-			}
 			for (int i = 0; i < zombies.size() && !collided; ++i)
 			{
-				if (mainChar.getBoundingBox().intersects(zombies.at(i).getBoundingBox()))
+				if (mainChar.collide(zombies.at(i)))
 					mainChar.move(-moveVec, dt);
 			}
 		}
@@ -303,9 +299,25 @@ int main(int argc, char* argv)
 		for (int i = 0; i < zombies.size(); ++i)
 		{
 			collided = false;
-			sf::Vector2f zmov = zombies.at(i).think(mainChar.getPosition()) * dt * zombies.at(i).getWalkSpeed();
-			zombies.at(i).move(zmov);
-			for (int l = 0; l < lightShapes.size(); ++l)
+			sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
+			zombies.at(i).move(zmov, dt);
+
+			if (zombies.at(i).collide(lightShapes))
+			{
+				collided = true;
+				zombies.at(i).move(-zmov, dt);
+			}
+
+			for (int j = 0; j < zombies.size() && !collided; ++j)
+			{
+				if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
+					zombies.at(i).move(-zmov, dt);
+			}
+
+			if (!collided && zombies.at(i).collide(mainChar))
+				zombies.at(i).move(-zmov, dt);
+			/*for (int l = 0; l < lightShapes.size(); ++l)
+>>>>>>> new collide
 			{
 				if (zombies.at(i).getBoundingBox().intersects(lightShapes[l]->_shape.getGlobalBounds()))
 				{
@@ -320,10 +332,7 @@ int main(int argc, char* argv)
 					if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
 						zombies.at(i).move(-zmov, dt);
 				}
-
-				if(zombies.at(i).getBoundingBox().intersects(mainChar.getBoundingBox()) && !collided)
-					zombies.at(i).move(-zmov);
-			}
+			}*/
 		}
 		//*** ai
 

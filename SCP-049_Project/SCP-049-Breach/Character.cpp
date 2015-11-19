@@ -116,6 +116,15 @@ bool Character::collide(std::vector<Character>& list)
 	return false;
 }
 
+bool Character::collide(Character& c)
+{
+	if (getBoundingBox().intersects(c.getBoundingBox()))
+	{
+		return true;
+	}
+	return false;
+}
+
 sf::FloatRect Character::getBoundingBox()
 {
 	sf::Vector2f halfSize(boundingSize*0.5f, boundingSize*0.5f);

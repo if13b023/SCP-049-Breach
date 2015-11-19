@@ -8,6 +8,6 @@ public:
 	Zombie();
 	~Zombie();
 
-	sf::Vector2f think(sf::Vector2f);
+	sf::Vector2f think(Character&);
 };
 
