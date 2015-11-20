@@ -18,5 +18,6 @@ public:
 private:
 	std::shared_ptr<ltbl::LightPointEmission> m_flashlight;
 	bool m_lightswitch;
+	virtual void update_internal(float);
 };
 

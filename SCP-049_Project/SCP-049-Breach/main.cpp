@@ -87,10 +87,10 @@ int main(int argc, char* argv)
 
 	//GUI
 	sf::Font font;
-	font.loadFromFile("C:/FH/Sem5/GameDev/SCP-049-Breach/SCP-049_Project/x64/Debug/resources/fonts/data-latin.ttf");
-	sf::Text healthBar("Test", font, 50);
+	font.loadFromFile("resources/OpenSans-Regular.ttf");
+	sf::Text healthBar("Test", font, 75);
 	healthBar.setColor(sf::Color::White);
-	healthBar.setScale(2.0f, 2.0f);
+	healthBar.setPosition(20.0f, 10.0f);
 	//*** gui
 
 	//LightSystem
@@ -236,10 +236,13 @@ int main(int argc, char* argv)
 			}
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-			mainChar.setState(Character::Run);
-		else
-			mainChar.setState(Character::Walk);
+		if (mainChar.getState() != Character::Dead)
+		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+				mainChar.setState(Character::Run);
+			else
+				mainChar.setState(Character::Walk);
+		}
 
 		sf::Vector2f moveVec;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -261,6 +264,7 @@ int main(int argc, char* argv)
 		bgBounds.width -= border;
 		bgBounds.left += border;
 		bgBounds.top += border;
+		mainChar.update(dt);
 		if(!bgBounds.contains(mainChar.getPosition()))
 			mainChar.move(-moveVec, dt);
 		else
@@ -283,6 +287,7 @@ int main(int argc, char* argv)
 		collided = false;
 		for (int i = 0; i < zombies.size(); ++i)
 		{
+			zombies.at(i).update(dt);
 			collided = false;
 			sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
 			zombies.at(i).move(zmov, dt);
@@ -300,11 +305,15 @@ int main(int argc, char* argv)
 			}
 
 			if (!collided && zombies.at(i).collide(mainChar))
+			{
+				//zombies.at(i).attack(mainChar);
 				zombies.at(i).move(-zmov, dt);
+			}
 		}
 		//*** ai
 
 		view.setCenter(mainChar.getPosition());
+		healthBar.setString(std::to_string(static_cast<int>(mainChar.getHealth())));
 
 		//Flashlight Rotation
 		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
@@ -319,7 +328,10 @@ int main(int argc, char* argv)
 		window.draw(bgSprite);
 
 		for (int i = 0; i < zombies.size(); ++i)
+		{
 			window.draw(zombies.at(i).getSprite());
+			window.draw(zombies.at(i).getFOV());
+		}
 		window.draw(mainChar.getSprite());
 
 		window.draw(bgTopSprite);

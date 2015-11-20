@@ -30,6 +30,7 @@ public:
 	float getWalkSpeed(float dt = 1.0f);
 
 	void setState(charState);
+	int getState();
 
 	float getAttackDmg();
 
@@ -46,6 +47,8 @@ public:
 
 	float getHealth();
 
+	void update(float);
+
 protected:
 	charState m_state;
 	sf::Sprite m_sprite;
@@ -58,7 +61,9 @@ protected:
 	float walkSpeed;
 	float m_attackDmg;
 	float m_attackSpeed;
+	float m_attackCooldown;
 
 	void updateBoundingSize();
+	virtual void update_internal(float);
 };
 

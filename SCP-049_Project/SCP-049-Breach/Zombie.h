@@ -9,5 +9,9 @@ public:
 	~Zombie();
 
 	sf::Vector2f think(Character&);
+	sf::CircleShape getFOV();
+private:
+	virtual void update_internal(float dt);
+	sf::CircleShape m_fov;
 };
 

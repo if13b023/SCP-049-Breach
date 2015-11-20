@@ -39,6 +39,16 @@ bool MainCharacter::getFlashlightSwitch()
 
 void MainCharacter::move(sf::Vector2f pos, float dt)
 {
+	if (m_state == Character::Dead)
+		return;
 	Character::move(pos, dt);
 	m_flashlight->_emissionSprite.setPosition(position);
+}
+
+void MainCharacter::update_internal(float dt)
+{
+	//Health regen
+	if (health < 100.0f && m_state != Character::Dead)
+		health += (10.0f*dt);
+	//*** hr
 }

@@ -5,7 +5,10 @@ Character::Character()
 		position(0, 0),
 		walkSpeed(200.0f),
 		stamina(100.0f),
-		m_state(Character::Walk)
+		m_state(Character::Walk),
+		m_attackDmg(49.0f),
+		m_attackSpeed(30.0f),
+		m_attackCooldown(0.0f)
 {
 }
 
@@ -127,7 +130,11 @@ bool Character::collide(Character& c)
 
 void Character::attack(Character& c)
 {
-	c.damage(m_attackDmg);
+	if (m_attackCooldown < 10.0f)
+	{
+		m_attackCooldown += m_attackSpeed;
+		c.damage(m_attackDmg);
+	}
 }
 
 bool Character::damage(float dmg)
@@ -147,6 +154,15 @@ bool Character::damage(float dmg)
 float Character::getHealth()
 {
 	return health;
+}
+
+void Character::update(float dt)
+{
+	update_internal(dt);
+}
+
+void Character::update_internal(float)
+{
 }
 
 sf::FloatRect Character::getBoundingBox()
@@ -178,16 +194,16 @@ float Character::getWalkSpeed(float dt)
 	case Character::Walk:
 			if (stamina < 100.0f)
 				stamina += 10.0f * dt;
-			return 200.0f * dt;
+			return walkSpeed * dt;
 		break;
 	case Character::Run:
 			if (stamina > 0)
 			{
 				stamina -= 30.0f * dt;
-				return 400.0f * dt;
+				return walkSpeed * 1.5f * dt;
 			}
 			else
-				return 200.0f * dt;
+				return walkSpeed * dt;
 		break;
 	}
 
@@ -197,6 +213,11 @@ float Character::getWalkSpeed(float dt)
 void Character::setState(charState newState)
 {
 	m_state = newState;
+}
+
+int Character::getState()
+{
+	return m_state;
 }
 
 float Character::getAttackDmg()
