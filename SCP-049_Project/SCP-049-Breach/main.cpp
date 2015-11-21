@@ -16,15 +16,6 @@
 
 #include "normalize.h"
 
-bool ViewportLock(const sf::View& v, const sf::Vector2f& pos)
-{
-	sf::Vector2f topLeft = v.getCenter() - (v.getSize() / 2.0f);
-	std::cout << "debug -> \t" << topLeft.x << ":" << topLeft.y << std::endl;
-	//if ((v.left <= pos.x) || (v.top <= pos.y))
-	//	return false;
-	return true;
-}
-
 int main(int argc, char* argv)
 {
 	//argument parsing
@@ -148,7 +139,7 @@ int main(int argc, char* argv)
 	{
 		std::cout << "Couldn't load \"tex / Zombie_01.png\"" << std::endl;
 	}*/
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		z.setPosition(z.getPosition() + sf::Vector2f(z.getSprite().getGlobalBounds().width + 50.0f , 0));
 		zombies.push_back(z);
@@ -290,9 +281,10 @@ int main(int argc, char* argv)
 			zombies.at(i).update(dt);
 			collided = false;
 			sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
+
 			zombies.at(i).move(zmov, dt);
 
-			if (zombies.at(i).collide(lightShapes))
+			if (zombies.at(i).collide(lightShapes) || !bgBounds.contains(zombies.at(i).getPosition()))
 			{
 				collided = true;
 				zombies.at(i).move(-zmov, dt);
@@ -330,11 +322,15 @@ int main(int argc, char* argv)
 		for (int i = 0; i < zombies.size(); ++i)
 		{
 			window.draw(zombies.at(i).getSprite());
-			window.draw(zombies.at(i).getFOV());
+			//window.draw(zombies.at(i).getFOV());
+			/*sf::CircleShape zc(10.0f, 3);
+			zc.setFillColor(sf::Color::Red);
+			zc.setPosition(zombies.at(i).getTarget());
+			window.draw(zc);*/
 		}
 		window.draw(mainChar.getSprite());
 
-		window.draw(bgTopSprite);
+		//window.draw(bgTopSprite);
 
 		ls.render(view, unshadowShader, lightOverShapeShader);
 		sf::Sprite lightSprite;
