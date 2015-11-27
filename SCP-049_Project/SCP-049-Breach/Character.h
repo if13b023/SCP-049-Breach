@@ -15,18 +15,18 @@ public:
 	bool setSprite(const char*);
 	bool setSprite(sf::Texture&);
 	bool setSprite(sf::Sprite);
-	sf::Sprite getSprite();
+	sf::Sprite getSprite() const;
 
-	sf::Vector2f getPosition();
+	sf::Vector2f getPosition() const;
 	void setPosition(sf::Vector2f);
 	void setPosition(float, float);
 
-	float getRotation();
+	float getRotation() const;
 	void setRotation(float);
 
 	void setScale(float);
 
-	float getStamina();
+	float getStamina() const;
 	float getWalkSpeed(float dt = 1.0f);
 
 	void setState(charState);
@@ -45,7 +45,7 @@ public:
 	void attack(Character&);
 	bool damage(float);
 
-	float getHealth();
+	float getHealth() const;
 
 	void update(float);
 

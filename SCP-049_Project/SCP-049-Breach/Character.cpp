@@ -48,7 +48,7 @@ bool Character::setSprite(sf::Texture& tex)
 	return true;
 }
 
-sf::Vector2f Character::getPosition()
+sf::Vector2f Character::getPosition() const
 {
 	return position;
 }
@@ -65,7 +65,7 @@ void Character::setPosition(float x, float y)
 	m_sprite.setPosition(position);
 }
 
-float Character::getRotation()
+float Character::getRotation() const
 {
 	return m_sprite.getRotation();
 }
@@ -75,7 +75,7 @@ void Character::setRotation(float angle)
 	m_sprite.setRotation(angle);
 }
 
-sf::Sprite Character::getSprite()
+sf::Sprite Character::getSprite() const
 {
 	return m_sprite;
 }
@@ -151,7 +151,7 @@ bool Character::damage(float dmg)
 	return true; //Alive
 }
 
-float Character::getHealth()
+float Character::getHealth() const
 {
 	return health;
 }
@@ -182,7 +182,7 @@ void Character::updateBoundingSize()
 		boundingSize = w;
 }
 
-float Character::getStamina()
+float Character::getStamina() const
 {
 	return stamina;
 }

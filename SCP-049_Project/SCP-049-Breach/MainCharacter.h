@@ -13,11 +13,15 @@ public:
 	bool toogleFlashlight();
 	bool getFlashlightSwitch();
 
+	bool hasKey();
+	void collectKey();
+
 	void move(sf::Vector2f pos, float);
 
 private:
 	std::shared_ptr<ltbl::LightPointEmission> m_flashlight;
 	bool m_lightswitch;
 	virtual void update_internal(float);
+	bool m_hasKey;
 };
 

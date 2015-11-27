@@ -8,7 +8,7 @@ Zombie::Zombie()
 	m_fov = sf::CircleShape(150.0f, 3);
 	m_fov.setFillColor(sf::Color::Red);
 
-	srand(time(NULL));
+	//srand(time(NULL));
 	m_target = getPosition();
 	m_targetNext = 0;
 	m_targetChange = 1;

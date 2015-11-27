@@ -9,6 +9,7 @@ class GameObject
 {
 public:
 	GameObject();
+	GameObject(int);
 	~GameObject();
 
 	int ID();
@@ -17,5 +18,5 @@ public:
 	sf::Sprite* Sprite;
 
 private:
-	int _id;
+	int m_id;
 };

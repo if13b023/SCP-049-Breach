@@ -75,10 +75,10 @@
     <ClCompile Include="LightShapeMaker.cpp">
       <Filter>Unused</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Unused</Filter>
-    </ClCompile>
     <ClCompile Include="MainCharacter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,13 +131,13 @@
     <ClInclude Include="Zombies.h">
       <Filter>Unused</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Unused</Filter>
-    </ClInclude>
     <ClInclude Include="LightShapeMaker.h">
       <Filter>Unused</Filter>
     </ClInclude>
     <ClInclude Include="MainCharacter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

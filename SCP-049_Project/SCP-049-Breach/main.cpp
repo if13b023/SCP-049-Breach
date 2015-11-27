@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <thread>
+#include <time.h>
 
 #include "FileIO.h"
 #include "Character.h"
@@ -16,8 +17,12 @@
 
 #include "normalize.h"
 
+enum GameState{Running, Win, Lose};
+
 int main(int argc, char* argv)
 {
+	GameState state = Running;
+
 	//argument parsing
 	for (int i = 0; i < argc; i++)
 		std::cout << argv[i] << std::endl;
@@ -35,7 +40,7 @@ int main(int argc, char* argv)
 	//creating the window
 	sf::RenderWindow window;
 	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
-#define FULLSCREEN 0
+#define FULLSCREEN 1
 #if FULLSCREEN
 	vm.height = 1080;
 	vm.width = 1920;
@@ -76,6 +81,35 @@ int main(int argc, char* argv)
 	flashLightTex.loadFromFile("resources/flashlightTexture_g.png");
 	flashLightTex.setSmooth(true);
 
+	sf::Texture pointLightTex;
+	pointLightTex.loadFromFile("resources/pointLightTexture.png");
+	pointLightTex.setSmooth(true);
+
+	sf::Texture KeyTex;
+	KeyTex.loadFromFile("tex/KeyCard.png");
+	KeyTex.setSmooth(true);
+
+	sf::Texture WinTex;
+	WinTex.loadFromFile("tex/win.png");
+	WinTex.setSmooth(true);
+	sf::Sprite WinSprite(WinTex);
+
+	sf::Texture LoseTex;
+	LoseTex.loadFromFile("tex/lose.png");
+	LoseTex.setSmooth(true);
+	sf::Sprite LoseSprite(LoseTex);
+
+	//Key
+	sf::Sprite Key;
+	Key.setTexture(KeyTex);
+	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 2000, (static_cast<float>(rand() % 100) / 100) * 2000);
+	Key.setScale(0.1f, 0.1f);
+	//*** k
+
+	//Exit
+	sf::FloatRect exit(256.0f, 0, 110.0f, 50.0f);
+	//*** e
+
 	//GUI
 	sf::Font font;
 	font.loadFromFile("resources/OpenSans-Regular.ttf");
@@ -86,7 +120,7 @@ int main(int argc, char* argv)
 
 	//LightSystem
 	ltbl::LightSystem ls;
-	sf::Color ambientColor = sf::Color(100, 100, 100, 255);
+	sf::Color ambientColor = sf::Color(10, 10, 10, 255);
 	ls.create(sf::FloatRect(-10.0f, -10.0f, 10.0f, 10.0f), window.getSize(), penumbraTex, unshadowShader, lightOverShapeShader);
 	ls._ambientColor = ambientColor;
 
@@ -104,6 +138,20 @@ int main(int argc, char* argv)
 	light->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
 	ls.addLight(light);
+	//** fl
+
+	//Pointlight
+	std::shared_ptr<ltbl::LightPointEmission> lightPoint = std::make_shared<ltbl::LightPointEmission>();
+
+	sf::Color pointColor = sf::Color(100, 100, 100, 255);
+
+	lightPoint->_emissionSprite.setOrigin(sf::Vector2f(32.0f, 32.0f));
+	lightPoint->_emissionSprite.setTexture(pointLightTex);
+	lightPoint->_emissionSprite.setScale(sf::Vector2f(7.0f, 7.0f));
+	lightPoint->_emissionSprite.setColor(pointColor);
+	lightPoint->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
+
+	ls.addLight(lightPoint);
 	//** fl
 
 	/*sf::Texture characterTex;
@@ -134,14 +182,17 @@ int main(int argc, char* argv)
 	//Creating Zombies
 	//Zombies zombies;
 	std::vector<Zombie> zombies;
+	const int zCount = 20;
+	sf::Vector2f zPositions[zCount];
+	sf::Vector2f zPosTmp;
 	zombies.reserve(16);
-	/*if (!zombies.setTexture("tex/Zombie_01.png"))
+	for (int i = 0; i < zCount; ++i)
 	{
-		std::cout << "Couldn't load \"tex / Zombie_01.png\"" << std::endl;
-	}*/
-	for (int i = 0; i < 10; ++i)
-	{
-		z.setPosition(z.getPosition() + sf::Vector2f(z.getSprite().getGlobalBounds().width + 50.0f , 0));
+		do {
+			zPosTmp = sf::Vector2f((static_cast<float>(rand()%100)/100) * 2000, (static_cast<float>(rand() % 100) / 100) * 2000);
+			std::cout << zPosTmp.x << ":" << zPosTmp.y << std::endl;
+		} while(false);
+		z.setPosition(zPosTmp);
 		zombies.push_back(z);
 	}
 	//*** cz
@@ -149,6 +200,7 @@ int main(int argc, char* argv)
 	sf::Event eve;
 
 	bool quit = false;
+
 
 	sf::Clock clock;
 	float dt = 0.016f;
@@ -235,6 +287,12 @@ int main(int argc, char* argv)
 				mainChar.setState(Character::Walk);
 		}
 
+		//if (mainChar.getFlashlightSwitch())
+			//lightPoint->_emissionSprite.setColor(sf::Color::Black);
+		//else
+			lightPoint->_emissionSprite.setColor(pointColor);
+		lightPoint->_emissionSprite.setPosition(mainChar.getPosition());
+
 		sf::Vector2f moveVec;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 			moveVec.x = -1.0f;
@@ -272,6 +330,24 @@ int main(int argc, char* argv)
 					mainChar.move(-moveVec, dt);
 			}
 		}
+
+		if (mainChar.getSprite().getGlobalBounds().intersects(Key.getGlobalBounds()))
+		{
+			mainChar.collectKey();
+			Key.setScale(0.5f, 0.5f);
+			Key.setPosition(window.getDefaultView().getSize().x - 200.0f, window.getDefaultView().getSize().y - 150.0f);
+		}
+
+		if (mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
+		{
+			state = Win;
+			//quit = true;
+		}
+
+		if (mainChar.getState() == Character::Dead)
+		{
+			state = Lose;
+		}
 		//*** mccd
 
 		//AI
@@ -298,7 +374,7 @@ int main(int argc, char* argv)
 
 			if (!collided && zombies.at(i).collide(mainChar))
 			{
-				//zombies.at(i).attack(mainChar);
+				zombies.at(i).attack(mainChar);
 				zombies.at(i).move(-zmov, dt);
 			}
 		}
@@ -315,35 +391,55 @@ int main(int argc, char* argv)
 
 		window.clear();
 
-		window.setView(view);
-
-		window.draw(bgSprite);
-
-		for (int i = 0; i < zombies.size(); ++i)
+		if (state == Running)
 		{
-			window.draw(zombies.at(i).getSprite());
-			//window.draw(zombies.at(i).getFOV());
-			/*sf::CircleShape zc(10.0f, 3);
-			zc.setFillColor(sf::Color::Red);
-			zc.setPosition(zombies.at(i).getTarget());
-			window.draw(zc);*/
+			window.setView(view);
+
+			window.draw(bgSprite);
+
+			if (!mainChar.hasKey())
+				window.draw(Key);
+
+			for (int i = 0; i < zombies.size(); ++i)
+			{
+				window.draw(zombies.at(i).getSprite());
+				//window.draw(zombies.at(i).getFOV());
+				/*sf::CircleShape zc(10.0f, 3);
+				zc.setFillColor(sf::Color::Red);
+				zc.setPosition(zombies.at(i).getTarget());
+				window.draw(zc);*/
+			}
+			window.draw(mainChar.getSprite());
+
+			//window.draw(bgTopSprite);
+
+			ls.render(view, unshadowShader, lightOverShapeShader);
+			sf::Sprite lightSprite;
+			lightSprite.setTexture(ls.getLightingTexture());
+
+			sf::RenderStates lightRenderStates;
+			lightRenderStates.blendMode = sf::BlendMultiply;
+
+			window.setView(window.getDefaultView());
+			window.draw(lightSprite, lightRenderStates);
+
+			window.draw(healthBar);
+
+			if (mainChar.hasKey())
+				window.draw(Key);
+
+			window.setView(view);
 		}
-		window.draw(mainChar.getSprite());
-
-		//window.draw(bgTopSprite);
-
-		ls.render(view, unshadowShader, lightOverShapeShader);
-		sf::Sprite lightSprite;
-		lightSprite.setTexture(ls.getLightingTexture());
-
-		sf::RenderStates lightRenderStates;
-		lightRenderStates.blendMode = sf::BlendMultiply;
-
-		window.setView(window.getDefaultView());
-		window.draw(lightSprite, lightRenderStates);
-
-		window.draw(healthBar);
-		window.setView(view);
+		else if (state == Win)
+		{
+			window.setView(window.getDefaultView());
+			window.draw(WinSprite);
+		}
+		else if (state == Lose)
+		{
+			window.setView(window.getDefaultView());
+			window.draw(LoseSprite);
+		}
 
 		window.display();
 

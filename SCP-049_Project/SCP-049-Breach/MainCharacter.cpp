@@ -3,8 +3,9 @@
 
 
 MainCharacter::MainCharacter()
+	:	m_lightswitch(true),
+		m_hasKey(false)
 {
-	m_lightswitch = true;
 }
 
 
@@ -51,4 +52,14 @@ void MainCharacter::update_internal(float dt)
 	if (health < 100.0f && m_state != Character::Dead)
 		health += (10.0f*dt);
 	//*** hr
+}
+
+bool MainCharacter::hasKey()
+{
+	return m_hasKey;
+}
+
+void MainCharacter::collectKey()
+{
+	m_hasKey = true;
 }
