@@ -40,7 +40,7 @@ int main(int argc, char* argv)
 	//creating the window
 	sf::RenderWindow window;
 	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
-#define FULLSCREEN 1
+#define FULLSCREEN 0
 #if FULLSCREEN
 	vm.height = 1080;
 	vm.width = 1920;
@@ -67,6 +67,14 @@ int main(int argc, char* argv)
 	sf::Sprite bgTopSprite(bgTopTex);
 	bgTopSprite.setTextureRect(sf::IntRect(0, 0, bgTopTex.getSize().x, bgTopTex.getSize().y));
 	bgTopSprite.setPosition(0, 0);
+
+	sf::Texture bgLightTex;
+	assert(bgLightTex.loadFromFile("data/Level1_2_big_light.png"));
+	bgLightTex.setRepeated(false);
+
+	sf::Sprite bgLightSprite(bgLightTex);
+	bgLightSprite.setTextureRect(sf::IntRect(0, 0, bgLightTex.getSize().x, bgLightTex.getSize().y));
+	bgLightSprite.setPosition(0, 0);
 
 	sf::Shader unshadowShader;
 	sf::Shader lightOverShapeShader;
@@ -374,7 +382,7 @@ int main(int argc, char* argv)
 
 			if (!collided && zombies.at(i).collide(mainChar))
 			{
-				zombies.at(i).attack(mainChar);
+				//zombies.at(i).attack(mainChar);
 				zombies.at(i).move(-zmov, dt);
 			}
 		}
@@ -411,17 +419,33 @@ int main(int argc, char* argv)
 			}
 			window.draw(mainChar.getSprite());
 
-			//window.draw(bgTopSprite);
+			window.draw(bgTopSprite);
 
 			ls.render(view, unshadowShader, lightOverShapeShader);
 			sf::Sprite lightSprite;
 			lightSprite.setTexture(ls.getLightingTexture());
 
 			sf::RenderStates lightRenderStates;
+			
+			sf::RenderTexture lightMultiLayer;
+			lightMultiLayer.create(lightSprite.getTextureRect().width, lightSprite.getTextureRect().height);
+			//lightMultiLayer.draw(lightSprite);
+			lightRenderStates.blendMode = sf::BlendAdd;
+			//bgLightSprite.setTextureRect(sf::IntRect(view));
+			lightMultiLayer.draw(bgLightSprite, lightRenderStates);
+
+			lightRenderStates.blendMode = sf::BlendMultiply;
+
+			//lightSprite.setTexture(lightMultiLayer.getTexture());
+			sf::Sprite lightMultiSprite;
+			lightMultiSprite.setTexture(lightMultiLayer.getTexture());
+
+			//window.setView(window.getDefaultView());
+			window.draw(lightMultiSprite, lightRenderStates);
+			
 			lightRenderStates.blendMode = sf::BlendMultiply;
 
 			window.setView(window.getDefaultView());
-			window.draw(lightSprite, lightRenderStates);
 
 			window.draw(healthBar);
 
