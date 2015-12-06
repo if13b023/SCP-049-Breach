@@ -69,8 +69,9 @@ int main(int argc, char** argv)
 	bgTopSprite.setPosition(0, 0);
 
 	sf::Texture bgLightTex;
-	assert(bgLightTex.loadFromFile("data/Level1_2_big_light.png"));
+	assert(bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"));
 	bgLightTex.setRepeated(false);
+	bgLightTex.setSmooth(false);
 
 	sf::Sprite bgLightSprite(bgLightTex);
 	bgLightSprite.setTextureRect(sf::IntRect(0, 0, bgLightTex.getSize().x, bgLightTex.getSize().y));
@@ -430,14 +431,17 @@ int main(int argc, char** argv)
 			sf::RenderTexture lightMultiLayer;
 			lightMultiLayer.create(lightSprite.getTextureRect().width, lightSprite.getTextureRect().height);
 			lightRenderStates.blendMode = sf::BlendAdd;
-			bgLightSprite.setScale(1, -1);
-			bgLightSprite.setPosition(0, 720);
-			lightSprite.setScale(1, -1);
-			lightSprite.setPosition(0, 720);
 
-			window.setView(window.getDefaultView());
-			lightMultiLayer.draw(bgLightSprite, lightRenderStates);
+			bgLightSprite.setScale(1, -1);
+			//bgLightSprite.setPosition(0, 0);
+			lightSprite.setScale(1, -1);
+			lightSprite.setPosition(0, vm.height);
+
 			lightMultiLayer.draw(lightSprite, lightRenderStates);
+			sf::View view2(view);
+			view2.setCenter(view2.getCenter().x, -view2.getCenter().y);
+			lightMultiLayer.setView(view2);
+			lightMultiLayer.draw(bgLightSprite, lightRenderStates);
 
 			lightRenderStates.blendMode = sf::BlendMultiply;
 
@@ -445,7 +449,7 @@ int main(int argc, char** argv)
 			sf::Sprite lightMultiSprite;
 			lightMultiSprite.setTexture(lightMultiLayer.getTexture());
 
-			//window.setView(window.getDefaultView());
+			window.setView(window.getDefaultView());
 			window.draw(lightMultiSprite, lightRenderStates);
 			
 			lightRenderStates.blendMode = sf::BlendMultiply;
@@ -477,7 +481,10 @@ int main(int argc, char** argv)
 		cnt++;
 		if (cnt % 100 == 0 && show_fps)
 		{
-			std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << " - " << mainChar.getStamina() << std::endl;
+			//std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << std::endl;
+			
+			sf::Vector2f tf = view.getCenter() - (view.getSize()/2.0f);
+			std::cout << " - " << tf.x << "/" << tf.y << "/" << view.getSize().x << "/" << view.getSize().y << std::endl;
 			cnt = 0;
 		}
 	}
