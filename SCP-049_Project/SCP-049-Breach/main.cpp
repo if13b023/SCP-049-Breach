@@ -19,7 +19,7 @@
 
 enum GameState{Running, Win, Lose};
 
-int main(int argc, char* argv)
+int main(int argc, char** argv)
 {
 	GameState state = Running;
 
@@ -429,10 +429,15 @@ int main(int argc, char* argv)
 			
 			sf::RenderTexture lightMultiLayer;
 			lightMultiLayer.create(lightSprite.getTextureRect().width, lightSprite.getTextureRect().height);
-			//lightMultiLayer.draw(lightSprite);
 			lightRenderStates.blendMode = sf::BlendAdd;
-			//bgLightSprite.setTextureRect(sf::IntRect(view));
+			bgLightSprite.setScale(1, -1);
+			bgLightSprite.setPosition(0, 720);
+			lightSprite.setScale(1, -1);
+			lightSprite.setPosition(0, 720);
+
+			window.setView(window.getDefaultView());
 			lightMultiLayer.draw(bgLightSprite, lightRenderStates);
+			lightMultiLayer.draw(lightSprite, lightRenderStates);
 
 			lightRenderStates.blendMode = sf::BlendMultiply;
 
