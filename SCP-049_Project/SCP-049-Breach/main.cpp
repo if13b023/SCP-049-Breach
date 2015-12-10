@@ -9,6 +9,7 @@
 #include <iostream>
 #include <thread>
 #include <time.h>
+#include <Windows.h>
 
 #include "FileIO.h"
 #include "Character.h"
@@ -21,13 +22,15 @@ enum GameState{Running, Win, Lose};
 
 int main(int argc, char** argv)
 {
+	FreeConsole();
+
 	GameState state = Running;
 
 	//argument parsing
-	for (int i = 0; i < argc; i++)
-		std::cout << argv[i] << std::endl;
+	//for (int i = 0; i < argc; i++)
+	//	std::cout << argv[i] << std::endl;
 	//***
-	
+
 	//INIT
 	sf::VideoMode vm;
 	vm.width = 1280;
@@ -38,19 +41,35 @@ int main(int argc, char** argv)
 		abort();
 
 	std::list<std::thread> threads;
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 
 	//creating the window
 	sf::RenderWindow window;
 	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
-#define FULLSCREEN 0
-#if FULLSCREEN
-	vm.height = 1080;
-	vm.width = 1920;
-	style = sf::Style::Fullscreen;
-#endif
+
+	if (argc > 1)
+	{
+		if (strcmp(argv[1], "-fullscreen") == 0)
+		{
+			vm.height = 1080;
+			vm.width = 1920;
+			style = sf::Style::Fullscreen;
+		}
+
+	}
 	window.create(vm, "SCP-049-Breach", style);
 	window.setMouseCursorVisible(false);
+
+	//Loading Screen
+	sf::Font font_default;
+	font_default.loadFromFile("resources/OpenSans-Regular.ttf");
+
+	sf::Text loading("loading...", font_default, 30);
+	loading.setColor(sf::Color::White);
+	loading.setPosition(10.0f, 10.0f);
+	window.draw(loading);
+	window.display();
+	//** ls
 
 	//loading Textures and creating Sprites
 	sf::Texture bgTex;
@@ -105,6 +124,7 @@ int main(int argc, char** argv)
 	KeyTex.loadFromFile("tex/KeyCard.png");
 	KeyTex.setSmooth(true);
 
+	/*
 	sf::Texture WinTex;
 	WinTex.loadFromFile("tex/win.png");
 	WinTex.setSmooth(true);
@@ -117,12 +137,12 @@ int main(int argc, char** argv)
 	LoseTex.setSmooth(true);
 	sf::Sprite LoseSprite(LoseTex);
 	LoseSprite.setOrigin(LoseTex.getSize().x / 2, LoseTex.getSize().y / 2);
-	LoseSprite.setPosition(vm.width / 2, vm.height / 2);
+	LoseSprite.setPosition(vm.width / 2, vm.height / 2);*/
 
 	//Key
 	sf::Sprite Key;
 	Key.setTexture(KeyTex);
-	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 4000, (static_cast<float>(rand() % 100) / 100) * 4000);
+	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 4096, (static_cast<float>(rand() % 100) / 100) * 2048);
 	Key.setScale(0.1f, 0.1f);
 	std::cout << "Key: " << Key.getPosition().x << ":" << Key.getPosition().y << std::endl;
 	//*** k
@@ -132,11 +152,14 @@ int main(int argc, char** argv)
 	//*** e
 
 	//GUI
-	sf::Font font;
-	font.loadFromFile("resources/OpenSans-Regular.ttf");
-	sf::Text healthBar("Test", font, 75);
+	sf::Text healthBar("Test", font_default, 75);
 	healthBar.setColor(sf::Color::White);
-	healthBar.setPosition(20.0f, 10.0f);
+	healthBar.setPosition(vm.width - healthBar.getGlobalBounds().width - 20.0f, vm.height - healthBar.getGlobalBounds().height - 50.0f);
+
+	sf::Font font_end;
+	font_end.loadFromFile("resources/theend.ttf");
+	sf::Text endTitle("END", font_end, 100);
+	endTitle.setColor(sf::Color::White);
 	//*** gui
 
 	//LightSystem
@@ -189,6 +212,7 @@ int main(int argc, char** argv)
 	}
 	mainChar.setScale(0.15f);
 	mainChar.setFlashlight(light);
+	mainChar.setPosition(310.0f, 50.0f);
 
 	Zombie z;
 	if (!z.setSprite("tex/Zombie_01.png"))
@@ -197,20 +221,20 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	z.setScale(0.15f);
-	z.setPosition(100.0f, 100.0f);
+	z.setPosition(310.0f, 50.0f);
 	//***	loading Textures and creating Sprites
 
 	//Creating Zombies
 	//Zombies zombies;
 	std::vector<Zombie> zombies;
-	const int zCount = 20;
+	const int zCount = 10;
 	sf::Vector2f zPositions[zCount];
 	sf::Vector2f zPosTmp;
 	zombies.reserve(16);
 	for (int i = 0; i < zCount; ++i)
 	{
 		do {
-			zPosTmp = sf::Vector2f((static_cast<float>(rand()%100)/100) * 2000, (static_cast<float>(rand() % 100) / 100) * 2000);
+			zPosTmp = sf::Vector2f((static_cast<float>(rand()%100)/100) * 4096, (static_cast<float>(rand() % 100) / 100) * 2048);
 			std::cout << zPosTmp.x << ":" << zPosTmp.y << std::endl;
 		} while(false);
 		z.setPosition(zPosTmp);
@@ -231,7 +255,6 @@ int main(int argc, char** argv)
 	sf::View view = window.getDefaultView();
 	float zoomFactor = 1.0f;
 	view.zoom(0.5f);
-	mainChar.setPosition(view.getCenter());
 	FileWriter fw;
 	bool show_fps = false;
 
@@ -372,7 +395,7 @@ int main(int argc, char** argv)
 		{
 			mainChar.collectKey();
 			Key.setScale(0.5f, 0.5f);
-			Key.setPosition(window.getDefaultView().getSize().x - 200.0f, window.getDefaultView().getSize().y - 150.0f);
+			Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
 		}
 
 		if (mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
@@ -467,7 +490,7 @@ int main(int argc, char** argv)
 			bgLightSprite.setScale(1, -1);
 			//bgLightSprite.setPosition(0, 0);
 			lightSprite.setScale(1, -1);
-			lightSprite.setPosition(0, vm.height);
+			lightSprite.setPosition(0, static_cast<float>(vm.height));
 
 			lightMultiLayer.draw(lightSprite, lightRenderStates);
 			sf::View view2(view);
@@ -495,15 +518,19 @@ int main(int argc, char** argv)
 
 			window.setView(view);
 		}
-		else if (state == Win)
+		else if (state == Win || state == Lose)
 		{
+			if(state == Win)
+				endTitle.setString("YOU ESCAPED");
+			else
+				endTitle.setString("YOU DIED");
+
 			window.setView(window.getDefaultView());
-			window.draw(WinSprite);
-		}
-		else if (state == Lose)
-		{
-			window.setView(window.getDefaultView());
-			window.draw(LoseSprite);
+			endTitle.setPosition((vm.width - endTitle.getGlobalBounds().width) / 2, (vm.height - endTitle.getGlobalBounds().height)/2);
+			window.draw(endTitle);
+
+			loading.setString("please press ESC to exit...");
+			window.draw(loading);
 		}
 
 		window.display();
