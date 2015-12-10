@@ -33,9 +33,12 @@ int main(int argc, char** argv)
 	vm.width = 1280;
 	vm.height = 720;
 	vm.bitsPerPixel = 32;
-	assert(vm.isValid());
+	//assert(vm.isValid());
+	if (!vm.isValid())
+		abort();
 
 	std::list<std::thread> threads;
+	srand(time(NULL));
 
 	//creating the window
 	sf::RenderWindow window;
@@ -61,7 +64,9 @@ int main(int argc, char** argv)
 	bgSprite.setPosition(0, 0);
 
 	sf::Texture bgTopTex;
-	assert(bgTopTex.loadFromFile("data/Level1_2_big_top.png"));
+	//assert(bgTopTex.loadFromFile("data/Level1_2_big_top.png"));
+	if (!bgTopTex.loadFromFile("data/Level1_2_big_top.png"))
+		abort();
 	bgTopTex.setRepeated(false);
 
 	sf::Sprite bgTopSprite(bgTopTex);
@@ -69,7 +74,9 @@ int main(int argc, char** argv)
 	bgTopSprite.setPosition(0, 0);
 
 	sf::Texture bgLightTex;
-	assert(bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"));
+	//assert(bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"));
+	if (!bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"))
+		abort();
 	bgLightTex.setRepeated(false);
 	bgLightTex.setSmooth(false);
 
@@ -102,17 +109,22 @@ int main(int argc, char** argv)
 	WinTex.loadFromFile("tex/win.png");
 	WinTex.setSmooth(true);
 	sf::Sprite WinSprite(WinTex);
+	WinSprite.setOrigin(WinTex.getSize().x / 2, WinTex.getSize().y / 2);
+	WinSprite.setPosition(vm.width / 2, vm.height / 2);
 
 	sf::Texture LoseTex;
 	LoseTex.loadFromFile("tex/lose.png");
 	LoseTex.setSmooth(true);
 	sf::Sprite LoseSprite(LoseTex);
+	LoseSprite.setOrigin(LoseTex.getSize().x / 2, LoseTex.getSize().y / 2);
+	LoseSprite.setPosition(vm.width / 2, vm.height / 2);
 
 	//Key
 	sf::Sprite Key;
 	Key.setTexture(KeyTex);
-	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 2000, (static_cast<float>(rand() % 100) / 100) * 2000);
+	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 4000, (static_cast<float>(rand() % 100) / 100) * 4000);
 	Key.setScale(0.1f, 0.1f);
+	std::cout << "Key: " << Key.getPosition().x << ":" << Key.getPosition().y << std::endl;
 	//*** k
 
 	//Exit
@@ -267,7 +279,23 @@ int main(int argc, char** argv)
 				}
 				else if (eve.mouseButton.button == sf::Mouse::Right)
 				{
-
+					bool collided = false;
+					sf::FloatRect range;
+					range.height = range.width = 100.0f;
+					range.left = mainChar.getPosition().x - 50.0f;
+					range.top = mainChar.getPosition().y - 50.0f;
+					for (int i = 0; i < zombies.size() && !collided; ++i)
+					{
+						if(range.intersects(zombies.at(i).getBoundingBox()))
+						{
+							std::cout << "Attack!\n";
+							mainChar.attack(zombies.at(i));
+							if (zombies.at(i).getState() == Character::Dead)
+								std::cout << "Zombie died or is dead\n";
+							break;
+						}
+					}
+					collided = false;
 				}
 				break;
 			}
@@ -383,7 +411,7 @@ int main(int argc, char** argv)
 
 			if (!collided && zombies.at(i).collide(mainChar))
 			{
-				//zombies.at(i).attack(mainChar);
+				zombies.at(i).attack(mainChar);
 				zombies.at(i).move(-zmov, dt);
 			}
 		}
@@ -419,6 +447,10 @@ int main(int argc, char** argv)
 				window.draw(zc);*/
 			}
 			window.draw(mainChar.getSprite());
+
+			sf::RectangleShape rangedraw(sf::Vector2f(100.0f, 100.0f));
+			rangedraw.setPosition(mainChar.getPosition().x - 50.0f, mainChar.getPosition().y - 50.0f);
+			//window.draw(rangedraw);
 
 			window.draw(bgTopSprite);
 

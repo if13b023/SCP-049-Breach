@@ -23,5 +23,6 @@ private:
 	bool m_lightswitch;
 	virtual void update_internal(float);
 	bool m_hasKey;
+	float m_attackRange;
 };
 

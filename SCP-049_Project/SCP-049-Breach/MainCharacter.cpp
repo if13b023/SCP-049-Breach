@@ -4,8 +4,10 @@
 
 MainCharacter::MainCharacter()
 	:	m_lightswitch(true),
-		m_hasKey(false)
+		m_hasKey(false),
+		m_attackRange(10.0f)
 {
+	m_attackDmg = 110.0f;
 }
 
 
@@ -50,8 +52,16 @@ void MainCharacter::update_internal(float dt)
 {
 	//Health regen
 	if (health < 100.0f && m_state != Character::Dead)
-		health += (10.0f*dt);
+		health += (1.0f*dt);
 	//*** hr
+
+	//AttackCooldown
+	//m_attackCooldown = 0.0f;
+	if (m_attackCooldown > 0.0f)
+	{
+		m_attackCooldown -= (m_attackSpeed*dt);
+	}
+	//*** ac
 }
 
 bool MainCharacter::hasKey()

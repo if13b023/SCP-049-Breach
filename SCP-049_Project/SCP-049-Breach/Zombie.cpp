@@ -4,6 +4,7 @@ Zombie::Zombie()
 {
 	walkSpeed = 90.0f;
 	m_attackSpeed = 100.0f;
+	m_attackDmg = 49.0f;
 
 	m_fov = sf::CircleShape(150.0f, 3);
 	m_fov.setFillColor(sf::Color::Red);
@@ -20,6 +21,9 @@ Zombie::~Zombie()
 
 sf::Vector2f Zombie::think(Character& main)
 {
+	if (m_state == charState::Dead)
+		return sf::Vector2f(0, 0);
+
 	if (!getFOV().getGlobalBounds().intersects(main.getSprite().getGlobalBounds()))
 	{
 		if (m_targetChange > m_targetNext)
