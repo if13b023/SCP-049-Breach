@@ -22,6 +22,7 @@ ESC         -   Exit
 
 Alpha Limitations
 ------------------
+    #   No sounds...
     #   Please stay in the upper half of the Level (where the concrete paths are), the Key and Zombies only spawn there
     #   Some shadows are missing
     #   Zombies and Key can spawn inside each other or inside object -> please restart, sry
