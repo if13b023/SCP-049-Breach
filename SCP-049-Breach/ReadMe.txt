@@ -27,4 +27,5 @@ Alpha Limitations
     #   Some shadows are missing
     #   Zombies and Key can spawn inside each other or inside object -> please restart, sry
     #   Some collisions are weird
+    #   strange shadow glitches on some integrated graphic chips
     

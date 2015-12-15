@@ -29,6 +29,8 @@ public:
 	float getStamina() const;
 	float getWalkSpeed(float dt = 1.0f);
 
+	sf::Vector2f getDirection();
+
 	void setState(charState);
 	int getState();
 

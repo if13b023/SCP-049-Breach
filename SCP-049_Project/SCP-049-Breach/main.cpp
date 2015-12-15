@@ -1,6 +1,7 @@
 #include <ltbl\lighting\LightSystem.h>
 
-#include <SFML/Graphics.hpp>
+#include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 
 #include <sstream>
 #include <cassert>
@@ -22,7 +23,7 @@ enum GameState{Running, Win, Lose};
 
 int main(int argc, char** argv)
 {
-	FreeConsole();
+	//FreeConsole();
 
 	GameState state = Running;
 
@@ -124,21 +125,31 @@ int main(int argc, char** argv)
 	KeyTex.loadFromFile("tex/KeyCard.png");
 	KeyTex.setSmooth(true);
 
-	/*
-	sf::Texture WinTex;
-	WinTex.loadFromFile("tex/win.png");
-	WinTex.setSmooth(true);
-	sf::Sprite WinSprite(WinTex);
-	WinSprite.setOrigin(WinTex.getSize().x / 2, WinTex.getSize().y / 2);
-	WinSprite.setPosition(vm.width / 2, vm.height / 2);
+	//Sounds
+	sf::SoundBuffer soundbuffer[256];
 
-	sf::Texture LoseTex;
-	LoseTex.loadFromFile("tex/lose.png");
-	LoseTex.setSmooth(true);
-	sf::Sprite LoseSprite(LoseTex);
-	LoseSprite.setOrigin(LoseTex.getSize().x / 2, LoseTex.getSize().y / 2);
-	LoseSprite.setPosition(vm.width / 2, vm.height / 2);*/
+	soundbuffer[0].loadFromFile("sounds/flashlight02_on.wav");	//Flashlight On
+	soundbuffer[1].loadFromFile("sounds/flashlight02_off.wav");	//Flashlight Off
+	soundbuffer[2].loadFromFile("sounds/footgrass_01.wav");	//Footstep1
+	soundbuffer[3].loadFromFile("sounds/footgrass_02.wav");	//Footstep2
+	soundbuffer[4].loadFromFile("sounds/footgrass_03.wav");	//Footstep3
+	soundbuffer[5].loadFromFile("sounds/footgrass_04.wav");	//Footstep4
 
+	sf::Sound flashlightSnd[2];
+	flashlightSnd[0].setBuffer(soundbuffer[0]);
+	flashlightSnd[1].setBuffer(soundbuffer[1]);
+
+	sf::Sound footstepSnd[4];
+	float footstepCnt = 0;
+	footstepSnd[0].setBuffer(soundbuffer[2]);
+	footstepSnd[1].setBuffer(soundbuffer[3]);
+	footstepSnd[2].setBuffer(soundbuffer[4]);
+	footstepSnd[3].setBuffer(soundbuffer[5]);
+	
+	for (int i = 0; i < 4; ++i)
+		footstepSnd[i].setVolume(30.f);
+	//***
+	
 	//Key
 	sf::Sprite Key;
 	Key.setTexture(KeyTex);
@@ -298,6 +309,11 @@ int main(int argc, char** argv)
 			{
 				if (eve.mouseButton.button == sf::Mouse::Left)
 				{
+					if (mainChar.getFlashlightSwitch() == false)
+						flashlightSnd[0].play();
+					else
+						flashlightSnd[1].play();
+
 					mainChar.toogleFlashlight();
 				}
 				else if (eve.mouseButton.button == sf::Mouse::Right)
@@ -366,7 +382,27 @@ int main(int argc, char** argv)
 
 		//MainCharacter CollisionDetection
 		bool collided = false;
+		sf::Vector2f mainCharOldPos(mainChar.getPosition());
 		mainChar.move(moveVec, dt);
+
+		if (mainCharOldPos != mainChar.getPosition())
+		{
+			footstepCnt += dt;
+
+			float thres;
+
+			if (mainChar.getState() == Character::Walk)
+				thres = 0.5f;
+			else
+				thres = 0.35f;
+
+			if (footstepCnt > thres)
+			{
+				footstepCnt = 0;
+				footstepSnd[rand()%4].play();
+			}
+		}
+
 		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
 		float border = 30.0f;
 		bgBounds.height -= border;
@@ -398,13 +434,12 @@ int main(int argc, char** argv)
 			Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
 		}
 
-		if (mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
+		if (state == Running && mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
 		{
 			state = Win;
-			//quit = true;
 		}
 
-		if (mainChar.getState() == Character::Dead)
+		if (mainChar.getState() == Character::Dead && state != Win)
 		{
 			state = Lose;
 		}

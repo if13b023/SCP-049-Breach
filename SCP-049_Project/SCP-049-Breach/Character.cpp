@@ -210,6 +210,11 @@ float Character::getWalkSpeed(float dt)
 	return 0;
 }
 
+sf::Vector2f Character::getDirection()
+{
+	return direction;
+}
+
 void Character::setState(charState newState)
 {
 	m_state = newState;
