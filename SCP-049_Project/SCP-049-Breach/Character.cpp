@@ -8,7 +8,8 @@ Character::Character()
 		m_state(Character::Walk),
 		m_attackDmg(49.0f),
 		m_attackSpeed(30.0f),
-		m_attackCooldown(0.0f)
+		m_attackCooldown(0.0f),
+		m_gotHit(0)
 {
 }
 
@@ -140,7 +141,10 @@ void Character::attack(Character& c)
 bool Character::damage(float dmg)
 {
 	if (health > 0)
+	{
 		health -= dmg;
+		m_gotHit = 0.3f;
+	}
 
 	if (health < 0)
 	{
@@ -149,6 +153,11 @@ bool Character::damage(float dmg)
 	}
 
 	return true; //Alive
+}
+
+float Character::gotHit()
+{
+	return m_gotHit;
 }
 
 float Character::getHealth() const

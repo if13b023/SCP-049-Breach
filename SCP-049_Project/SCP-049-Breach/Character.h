@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 #include <ltbl\lighting\LightShape.h>
 #include <vector>
 #include "normalize.h"
@@ -46,6 +47,7 @@ public:
 
 	void attack(Character&);
 	bool damage(float);
+	float gotHit();
 
 	float getHealth() const;
 
@@ -64,6 +66,7 @@ protected:
 	float m_attackDmg;
 	float m_attackSpeed;
 	float m_attackCooldown;
+	float m_gotHit;
 
 	void updateBoundingSize();
 	virtual void update_internal(float);

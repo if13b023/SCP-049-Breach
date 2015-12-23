@@ -138,9 +138,18 @@ int main(int argc, char** argv)
 	sf::Sound flashlightSnd[2];
 	flashlightSnd[0].setBuffer(soundbuffer[0]);
 	flashlightSnd[1].setBuffer(soundbuffer[1]);
+	flashlightSnd[0].setRelativeToListener(true);
+	flashlightSnd[1].setRelativeToListener(true);
 
 	sf::Sound footstepSnd[4];
 	float footstepCnt = 0;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		footstepSnd[i].setBuffer(soundbuffer[i+2]);
+		footstepSnd[i].setRelativeToListener(true);
+	}
+
 	footstepSnd[0].setBuffer(soundbuffer[2]);
 	footstepSnd[1].setBuffer(soundbuffer[3]);
 	footstepSnd[2].setBuffer(soundbuffer[4]);
@@ -148,6 +157,8 @@ int main(int argc, char** argv)
 	
 	for (int i = 0; i < 4; ++i)
 		footstepSnd[i].setVolume(30.f);
+
+	soundbuffer[6].loadFromFile("sounds/zombie_snarl.wav");
 	//***
 	
 	//Key
@@ -233,6 +244,9 @@ int main(int argc, char** argv)
 	}
 	z.setScale(0.15f);
 	z.setPosition(310.0f, 50.0f);
+	z.breath[0].setBuffer(soundbuffer[6]);
+	z.breath[0].setRelativeToListener(false);
+	z.breath[0].setMinDistance(100.0f);
 	//***	loading Textures and creating Sprites
 
 	//Creating Zombies
@@ -445,10 +459,14 @@ int main(int argc, char** argv)
 		}
 		//*** mccd
 
+		sf::Listener::setPosition(mainChar.getPosition().x, mainChar.getPosition().y, 0);
+
 		//AI
 		collided = false;
 		for (int i = 0; i < zombies.size(); ++i)
 		{
+			sf::Vector3f sndTmp(zombies.at(i).getPosition().x, zombies.at(i).getPosition().y, 0);
+			zombies.at(i).breath[0].setPosition(sndTmp);
 			zombies.at(i).update(dt);
 			collided = false;
 			sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
@@ -545,6 +563,11 @@ int main(int argc, char** argv)
 			lightRenderStates.blendMode = sf::BlendMultiply;
 
 			window.setView(window.getDefaultView());
+
+			sf::RectangleShape bloodyScreen(sf::Vector2f(vm.width, vm.height));
+			bloodyScreen.setFillColor(sf::Color(((1.0f - mainChar.gotHit()) * 100) * 255, 0, 0));
+			if (mainChar.gotHit() > 0)
+				window.draw(bloodyScreen, lightRenderStates);
 
 			window.draw(healthBar);
 

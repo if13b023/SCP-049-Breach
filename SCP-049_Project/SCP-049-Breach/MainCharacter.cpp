@@ -62,6 +62,11 @@ void MainCharacter::update_internal(float dt)
 		m_attackCooldown -= (m_attackSpeed*dt);
 	}
 	//*** ac
+
+	//GotHit Cooldown
+	if (m_gotHit > 0)
+		m_gotHit -= dt;
+	//***
 }
 
 bool MainCharacter::hasKey()

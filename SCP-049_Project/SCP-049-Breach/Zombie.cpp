@@ -63,6 +63,16 @@ void Zombie::update_internal(float dt)
 		m_attackCooldown -= (m_attackSpeed*dt);
 	}
 	//*** as
+
+	//Breath
+	m_breathnext -= dt;
+	if (m_breathnext < 0)
+	{
+		m_breathnext = 1.0f + (rand() % 2);
+		int r = rand() % 4;
+		breath[r].play();
+	}
+	//*** b
 }
 
 sf::CircleShape Zombie::getFOV()

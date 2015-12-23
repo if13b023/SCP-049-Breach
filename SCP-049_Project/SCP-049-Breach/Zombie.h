@@ -15,11 +15,15 @@ public:
 	sf::Vector2f getTarget();
 
 	void move(sf::Vector2f, float);
+
+	sf::Sound breath[4];
 private:
 	virtual void update_internal(float dt);
 	sf::CircleShape m_fov;
 	sf::Vector2f m_target;
 	float m_targetChange;
 	int m_targetNext;
+
+	float m_breathnext = 1.0f;
 };
 
