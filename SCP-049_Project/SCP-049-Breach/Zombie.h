@@ -1,5 +1,6 @@
 #pragma once
 #include "Character.h"
+#include "MainCharacter.h"
 #include "normalize.h"
 #include <cstdlib>
 #include <time.h>
@@ -10,7 +11,7 @@ public:
 	Zombie();
 	~Zombie();
 
-	sf::Vector2f think(Character&);
+	sf::Vector2f think(MainCharacter&);
 	sf::CircleShape getFOV();
 	sf::Vector2f getTarget();
 
@@ -23,7 +24,8 @@ private:
 	sf::Vector2f m_target;
 	float m_targetChange;
 	int m_targetNext;
+	bool m_hasTracked;
 
-	float m_breathnext = 1.0f;
+	float m_breathnext;
 };
 

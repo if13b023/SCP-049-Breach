@@ -139,6 +139,7 @@
     <ClCompile Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.cpp" />
     <ClCompile Include="MainCharacter.cpp" />
     <ClCompile Include="normalize.cpp" />
+    <ClCompile Include="SCP049.cpp" />
     <ClCompile Include="Zombie.cpp" />
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="..\..\..\LTBL2-master\LTBL2\source\ltbl\quadtree\StaticQuadtree.h" />
     <ClInclude Include="MainCharacter.h" />
     <ClInclude Include="normalize.h" />
+    <ClInclude Include="SCP049.h" />
     <ClInclude Include="Zombie.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="GameObject.h" />

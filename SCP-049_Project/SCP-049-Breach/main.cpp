@@ -16,10 +16,11 @@
 #include "Character.h"
 #include "Zombie.h"
 #include "MainCharacter.h"
+#include "SCP049.h"
 
 #include "normalize.h"
 
-enum GameState{Running, Win, Lose};
+enum GameState{Running, Win, Lose, Paused};
 
 int main(int argc, char** argv)
 {
@@ -267,6 +268,17 @@ int main(int argc, char** argv)
 	}
 	//*** cz
 
+	//SCP049
+	SCP049 plagueDoctor;
+	if (!plagueDoctor.setSprite("tex/SCP049.png"))
+	{
+		std::cout << "Couldn't load \"tex / SCP049.png\"." << std::endl;
+		return 1;
+	}
+	plagueDoctor.setScale(0.08f);
+	plagueDoctor.setPosition(310.0f, 150.0f);
+	//*** scp
+
 	sf::Event eve;
 
 	bool quit = false;
@@ -323,7 +335,7 @@ int main(int argc, char** argv)
 			{
 				if (eve.mouseButton.button == sf::Mouse::Left)
 				{
-					if (mainChar.getFlashlightSwitch() == false)
+					if (mainChar.getFlashlightSwitch() == false && state == Running)
 						flashlightSnd[0].play();
 					else
 						flashlightSnd[1].play();
@@ -365,146 +377,167 @@ int main(int argc, char** argv)
 				case sf::Keyboard::Escape:
 					quit = true;
 					break;
+
+				case sf::Keyboard::P:
+					if (state == Running)
+						state = Paused;
+					else
+						state = Running;
+					break;
 				}
 			}
 		}
 
-		if (mainChar.getState() != Character::Dead)
+		if (mainChar.getState() != Character::Dead && state == Running)
 		{
+
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 				mainChar.setState(Character::Run);
 			else
 				mainChar.setState(Character::Walk);
-		}
 
-		//if (mainChar.getFlashlightSwitch())
-			//lightPoint->_emissionSprite.setColor(sf::Color::Black);
-		//else
+			//if (mainChar.getFlashlightSwitch())
+				//lightPoint->_emissionSprite.setColor(sf::Color::Black);
+			//else
 			lightPoint->_emissionSprite.setColor(pointColor);
-		lightPoint->_emissionSprite.setPosition(mainChar.getPosition());
+			lightPoint->_emissionSprite.setPosition(mainChar.getPosition());
 
-		sf::Vector2f moveVec;
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-			moveVec.x = -1.0f;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-			moveVec.x = 1.0f;
+			sf::Vector2f moveVec;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+				moveVec.x = -1.0f;
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+				moveVec.x = 1.0f;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-			moveVec.y = -1.0f;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-			moveVec.y = 1.0f;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+				moveVec.y = -1.0f;
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+				moveVec.y = 1.0f;
 
-		//MainCharacter CollisionDetection
-		bool collided = false;
-		sf::Vector2f mainCharOldPos(mainChar.getPosition());
-		mainChar.move(moveVec, dt);
+			//MainCharacter CollisionDetection
+			bool collided = false;
+			sf::Vector2f mainCharOldPos(mainChar.getPosition());
+			mainChar.move(moveVec, dt);
 
-		if (mainCharOldPos != mainChar.getPosition())
-		{
-			footstepCnt += dt;
-
-			float thres;
-
-			if (mainChar.getState() == Character::Walk)
-				thres = 0.5f;
-			else
-				thres = 0.35f;
-
-			if (footstepCnt > thres)
+			if (mainCharOldPos != mainChar.getPosition())
 			{
-				footstepCnt = 0;
-				footstepSnd[rand()%4].play();
+				footstepCnt += dt;
+
+				float thres;
+
+				if (mainChar.getState() == Character::Walk)
+					thres = 0.5f;
+				else
+					thres = 0.35f;
+
+				if (footstepCnt > thres)
+				{
+					footstepCnt = 0;
+					footstepSnd[rand() % 4].play();
+				}
 			}
-		}
 
-		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
-		float border = 30.0f;
-		bgBounds.height -= border;
-		bgBounds.width -= border;
-		bgBounds.left += border;
-		bgBounds.top += border;
-		mainChar.update(dt);
-		if(!bgBounds.contains(mainChar.getPosition()))
-			mainChar.move(-moveVec, dt);
-		else
-		{
-			if (mainChar.collide(lightShapes))
-			{
-				collided = true;
+			sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
+			float border = 30.0f;
+			bgBounds.height -= border;
+			bgBounds.width -= border;
+			bgBounds.left += border;
+			bgBounds.top += border;
+			mainChar.update(dt);
+			if (!bgBounds.contains(mainChar.getPosition()))
 				mainChar.move(-moveVec, dt);
-			}
-
-			for (int i = 0; i < zombies.size() && !collided; ++i)
+			else
 			{
-				if (mainChar.collide(zombies.at(i)))
+				if (mainChar.collide(lightShapes))
+				{
+					collided = true;
 					mainChar.move(-moveVec, dt);
+				}
+
+				for (int i = 0; i < zombies.size() && !collided; ++i)
+				{
+					if (mainChar.collide(zombies.at(i)))
+						mainChar.move(-moveVec, dt);
+				}
 			}
-		}
 
-		if (mainChar.getSprite().getGlobalBounds().intersects(Key.getGlobalBounds()))
-		{
-			mainChar.collectKey();
-			Key.setScale(0.5f, 0.5f);
-			Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
-		}
+			if (mainChar.getSprite().getGlobalBounds().intersects(Key.getGlobalBounds()))
+			{
+				mainChar.collectKey();
+				Key.setScale(0.5f, 0.5f);
+				Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
+			}
+			//*** mccd
 
-		if (state == Running && mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
-		{
-			state = Win;
-		}
+			sf::Listener::setPosition(mainChar.getPosition().x, mainChar.getPosition().y, 0);
 
-		if (mainChar.getState() == Character::Dead && state != Win)
-		{
-			state = Lose;
-		}
-		//*** mccd
-
-		sf::Listener::setPosition(mainChar.getPosition().x, mainChar.getPosition().y, 0);
-
-		//AI
-		collided = false;
-		for (int i = 0; i < zombies.size(); ++i)
-		{
-			sf::Vector3f sndTmp(zombies.at(i).getPosition().x, zombies.at(i).getPosition().y, 0);
-			zombies.at(i).breath[0].setPosition(sndTmp);
-			zombies.at(i).update(dt);
+			//Zombie AI
 			collided = false;
-			sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
-
-			zombies.at(i).move(zmov, dt);
-
-			if (zombies.at(i).collide(lightShapes) || !bgBounds.contains(zombies.at(i).getPosition()))
+			for (int i = 0; i < zombies.size(); ++i)
 			{
-				collided = true;
-				zombies.at(i).move(-zmov, dt);
-			}
+				sf::Vector3f sndTmp(zombies.at(i).getPosition().x, zombies.at(i).getPosition().y, 0);
+				zombies.at(i).breath[0].setPosition(sndTmp);
+				zombies.at(i).update(dt);
+				collided = false;
+				sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
 
-			for (int j = 0; j < zombies.size() && !collided; ++j)
-			{
-				if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
+				zombies.at(i).move(zmov, dt);
+
+				if (zombies.at(i).collide(lightShapes) || !bgBounds.contains(zombies.at(i).getPosition()))
+				{
+					collided = true;
 					zombies.at(i).move(-zmov, dt);
-			}
+				}
 
-			if (!collided && zombies.at(i).collide(mainChar))
+				for (int j = 0; j < zombies.size() && !collided; ++j)
+				{
+					if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
+						zombies.at(i).move(-zmov, dt);
+				}
+
+				if (!collided && zombies.at(i).collide(mainChar))
+				{
+					zombies.at(i).attack(mainChar);
+					zombies.at(i).move(-zmov, dt);
+				}
+			}
+			//*** zai
+
+			//PlagueDoctor AI
+			sf::Vector2f pdmov = plagueDoctor.think(mainChar) * dt * plagueDoctor.getWalkSpeed();
+			plagueDoctor.move(pdmov, dt);
+
+			if (mainChar.getSprite().getGlobalBounds().intersects(plagueDoctor.getBoundingBox()))
 			{
-				zombies.at(i).attack(mainChar);
-				zombies.at(i).move(-zmov, dt);
+				plagueDoctor.attack(mainChar);
 			}
+			//*** pdai
+
+			view.setCenter(mainChar.getPosition());
+			healthBar.setString(std::to_string(static_cast<int>(mainChar.getHealth())));
+
+			//Flashlight Rotation
+			sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
+			light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
+			mainChar.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
+			//** fr
+
+			//GameState
+			if (state == Running && mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
+			{
+				state = Win;
+				mainChar.setState(Character::Dead);
+			}
+
+			if (mainChar.getState() == Character::Dead && state != Win)
+			{
+				state = Lose;
+			}
+			//*** gs
 		}
-		//*** ai
-
-		view.setCenter(mainChar.getPosition());
-		healthBar.setString(std::to_string(static_cast<int>(mainChar.getHealth())));
-
-		//Flashlight Rotation
-		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
-		light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
-		mainChar.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
-		//** fr
 
 		window.clear();
 
-		if (state == Running)
+		if (state == Running || state == Paused)
 		{
 			window.setView(view);
 
@@ -523,6 +556,7 @@ int main(int argc, char** argv)
 				window.draw(zc);*/
 			}
 			window.draw(mainChar.getSprite());
+			window.draw(plagueDoctor.getSprite());
 
 			sf::RectangleShape rangedraw(sf::Vector2f(100.0f, 100.0f));
 			rangedraw.setPosition(mainChar.getPosition().x - 50.0f, mainChar.getPosition().y - 50.0f);
@@ -565,14 +599,25 @@ int main(int argc, char** argv)
 			window.setView(window.getDefaultView());
 
 			sf::RectangleShape bloodyScreen(sf::Vector2f(vm.width, vm.height));
-			bloodyScreen.setFillColor(sf::Color(((1.0f - mainChar.gotHit()) * 100) * 255, 0, 0));
+			bloodyScreen.setFillColor(sf::Color(255, (1.0f - (mainChar.gotHit() / 0.15f)) * 255, (1.0f - (mainChar.gotHit() / 0.15f)) * 255));
 			if (mainChar.gotHit() > 0)
+			{
+				//std::cout << (mainChar.gotHit()/0.3f) * 255 << std::endl;
 				window.draw(bloodyScreen, lightRenderStates);
+			}
 
 			window.draw(healthBar);
 
 			if (mainChar.hasKey())
 				window.draw(Key);
+
+			if (state == Paused)
+			{
+				bloodyScreen.setFillColor(sf::Color(0, 0, 0, 128));
+				window.draw(bloodyScreen);
+				loading.setString("paused...");
+				window.draw(loading);
+			}
 
 			window.setView(view);
 		}
@@ -598,10 +643,10 @@ int main(int argc, char** argv)
 		cnt++;
 		if (cnt % 100 == 0 && show_fps)
 		{
-			//std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << std::endl;
+			std::cout << dt << " - " << (1.0f / dt) << " - " << mainChar.getRotation() << std::endl;
 			
-			sf::Vector2f tf = view.getCenter() - (view.getSize()/2.0f);
-			std::cout << " - " << tf.x << "/" << tf.y << "/" << view.getSize().x << "/" << view.getSize().y << std::endl;
+			//sf::Vector2f tf = view.getCenter() - (view.getSize()/2.0f);
+			//std::cout << " - " << tf.x << "/" << tf.y << "/" << view.getSize().x << "/" << view.getSize().y << std::endl;
 			cnt = 0;
 		}
 	}

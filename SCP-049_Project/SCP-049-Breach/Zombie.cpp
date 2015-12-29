@@ -1,6 +1,8 @@
 #include "Zombie.h"
 
 Zombie::Zombie()
+	:m_hasTracked(false),
+	m_breathnext(1.0f)
 {
 	walkSpeed = 90.0f;
 	m_attackSpeed = 100.0f;
@@ -19,7 +21,7 @@ Zombie::~Zombie()
 {
 }
 
-sf::Vector2f Zombie::think(Character& main)
+sf::Vector2f Zombie::think(MainCharacter& main)
 {
 	if (m_state == charState::Dead)
 		return sf::Vector2f(0, 0);
@@ -28,8 +30,8 @@ sf::Vector2f Zombie::think(Character& main)
 	{
 		if (m_targetChange > m_targetNext)
 		{
-			m_target.y = position.y -250.0f + (rand() % 500);
-			m_target.x = position.x -250.0f + (rand() % 500);
+			m_target.y = position.y - 250.0f + (rand() % 500);
+			m_target.x = position.x - 250.0f + (rand() % 500);
 			//target = sf::Vector2f(500.0f, 500.0f);
 			m_targetChange = 0;
 			m_targetNext = 1000 + (rand() % 2000);
@@ -39,9 +41,16 @@ sf::Vector2f Zombie::think(Character& main)
 		sf::Vector2f diff = m_target - position;
 		if (diff.x > -5 && diff.y > -5 && diff.x < 5 && diff.y < 5)
 			return sf::Vector2f(0, 0);
+		m_hasTracked = false;
 	}
 	else
-		m_target = main.getPosition();
+	{
+		if (main.getFlashlightSwitch() || m_hasTracked)
+		{
+			m_hasTracked = true;
+			m_target = main.getPosition();
+		}
+	}
 
 	sf::Vector2f tmp = normalize(m_target - this->getPosition());
 	//this->setRotation((atan2f(tmp.y, tmp.x) * 180 / 3.1415f) - 90.0f);
@@ -61,6 +70,9 @@ void Zombie::update_internal(float dt)
 	if (m_attackCooldown > 0.0f)
 	{
 		m_attackCooldown -= (m_attackSpeed*dt);
+
+		if (m_attackCooldown < 0)
+			m_attackCooldown = 0;
 	}
 	//*** as
 

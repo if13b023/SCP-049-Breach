@@ -9,7 +9,8 @@ Character::Character()
 		m_attackDmg(49.0f),
 		m_attackSpeed(30.0f),
 		m_attackCooldown(0.0f),
-		m_gotHit(0)
+		m_gotHit(0),
+		m_enabled(true)
 {
 }
 
@@ -143,7 +144,7 @@ bool Character::damage(float dmg)
 	if (health > 0)
 	{
 		health -= dmg;
-		m_gotHit = 0.3f;
+		m_gotHit = 0.15f;
 	}
 
 	if (health < 0)
@@ -237,4 +238,14 @@ int Character::getState()
 float Character::getAttackDmg()
 {
 	return m_attackDmg;
+}
+
+void Character::enable(bool b)
+{
+	m_enabled = b;
+}
+
+bool Character::isEnabled()
+{
+	return m_enabled;
 }

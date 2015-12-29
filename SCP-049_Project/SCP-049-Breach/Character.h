@@ -1,9 +1,13 @@
 #pragma once
+
+#define _USE_MATH_DEFINES
+
 #include <SFML\Graphics.hpp>
 #include <SFML\Audio.hpp>
 #include <ltbl\lighting\LightShape.h>
 #include <vector>
 #include "normalize.h"
+#include <iostream>
 
 class Character
 {
@@ -53,7 +57,11 @@ public:
 
 	void update(float);
 
+	void enable(bool);
+	bool isEnabled();
+
 protected:
+	bool m_enabled;
 	charState m_state;
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
