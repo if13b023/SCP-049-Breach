@@ -265,7 +265,7 @@ int main(int argc, char** argv)
 
 	lightPoint->_emissionSprite.setOrigin(sf::Vector2f(32.0f, 32.0f));
 	lightPoint->_emissionSprite.setTexture(pointLightTex);
-	lightPoint->_emissionSprite.setScale(sf::Vector2f(7.0f, 7.0f));
+	lightPoint->_emissionSprite.setScale(sf::Vector2f(5.0f, 5.0f));
 	lightPoint->_emissionSprite.setColor(pointColor);
 	lightPoint->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
@@ -354,7 +354,12 @@ int main(int argc, char** argv)
 	plagueDoctor.enable(false);
 
 	for (int i = 0; i < 7; ++i)
+	{
 		plagueDoctor.talk[i].setBuffer(soundbuffer[i + 8]);
+		plagueDoctor.talk[i].setRelativeToListener(true);
+		plagueDoctor.talk[i].setPosition(0, 0, 0);
+		plagueDoctor.talk[i].setVolume(80);
+	}
 
 	plagueDoctor.knife.setBuffer(soundbuffer[16]);
 
@@ -374,6 +379,7 @@ int main(int argc, char** argv)
 	sf::View view = window.getDefaultView();
 	float zoomFactor = 1.0f;
 	view.zoom(0.5f);
+	view.zoom(1.1f);
 	bool show_fps = false;
 
 	window.setVerticalSyncEnabled(false);
@@ -398,7 +404,7 @@ int main(int argc, char** argv)
 			if (eve.type == sf::Event::MouseWheelScrolled)
 			{
 				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
-
+				/*
 				if (eve.mouseWheelScroll.delta < 0 && zoomFactor < 2.0f)
 				{
 					zoomFactor += 0.1f;
@@ -408,7 +414,7 @@ int main(int argc, char** argv)
 				{
 					zoomFactor -= 0.1f;
 					view.zoom(0.95f);
-				}
+				}*/
 				break;
 			}
 
@@ -477,6 +483,8 @@ int main(int argc, char** argv)
 					{
 						state = Running;
 						music.stop();
+						int r = rand() % 7;
+						plagueDoctor.talk[r].play();
 					}
 					break;
 				}
@@ -485,9 +493,6 @@ int main(int argc, char** argv)
 
 		if (mainChar.getState() != Character::Dead && state == Running)
 		{
-			if(plagueDoctor.knife.getStatus() != sf::SoundSource::Playing)
-				plagueDoctor.knife.play();
-
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 				mainChar.setState(Character::Run);
 			else
@@ -522,9 +527,9 @@ int main(int argc, char** argv)
 				float thres;
 
 				if (mainChar.getState() == Character::Walk)
-					thres = 0.5f;
+					thres = 0.6f;
 				else
-					thres = 0.35f;
+					thres = 0.4f;
 
 				if (footstepCnt > thres)
 				{
@@ -609,7 +614,11 @@ int main(int argc, char** argv)
 			}
 			
 			if (plagueDoctorDelay < 0.0f && !plagueDoctor.isEnabled())
+			{
+				plagueDoctorDelay = 1.0f;
 				plagueDoctor.enable(true);
+				plagueDoctor.knife.play();
+			}
 
 			sf::Vector2f pdmov = plagueDoctor.think(mainChar) * dt * plagueDoctor.getWalkSpeed();
 			plagueDoctor.move(pdmov, dt);
@@ -728,6 +737,7 @@ int main(int argc, char** argv)
 			{
 				bloodyScreen.setFillColor(sf::Color(0, 0, 0, 128));
 				window.draw(bloodyScreen);
+				loading.setPosition(50.0f, 50.0f);
 				loading.setString("paused...");
 				window.draw(loading);
 			}
@@ -742,13 +752,14 @@ int main(int argc, char** argv)
 			if(died == false)
 			{
 				died = true;
+				if(state == Lose)
+					kill.play();
 			}
 
 			if(state == Win)
 				endTitle.setString("YOU ESCAPED");
 			else
 			{
-				kill.play();
 				endTitle.setString("YOU DIED");
 			}
 

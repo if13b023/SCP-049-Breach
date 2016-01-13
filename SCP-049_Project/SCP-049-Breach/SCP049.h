@@ -19,6 +19,7 @@ protected:
 	sf::Vector2f m_target;
 	float m_changePos;
 	int m_changeCnt;
+	bool m_talkEvent;
 
 	virtual void update_internal(float dt);
 };

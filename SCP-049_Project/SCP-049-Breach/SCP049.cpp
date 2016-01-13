@@ -4,7 +4,8 @@
 
 SCP049::SCP049()
 	:m_changePos(1.0f),
-	m_changeCnt(0)
+	m_changeCnt(0),
+	m_talkEvent(false)
 {
 	walkSpeed = 20.0f;
 	m_attackDmg = 150.0f;
@@ -39,6 +40,18 @@ sf::Vector2f SCP049::think(MainCharacter& main)
 	
 	sf::Vector2f distvec = position - main.getPosition();
 	float dist = sqrtf(powf(distvec.x, 2.0f) + powf(distvec.y, 2.0f));
+
+	if(dist < 200.0f)
+	{
+		if (m_talkEvent == false && m_enabled)
+		{
+			int r = 1 + (rand() % 6);
+			talk[r].play();
+			m_talkEvent = true;
+		}
+	}
+	else
+		m_talkEvent = false;
 
 	if (dist > 700.0f)
 	{
