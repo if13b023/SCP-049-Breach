@@ -122,3 +122,48 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shar
 
 	ls.addShape(list.at(index));
 }
+
+void FileWriter::LoadSpawnPoints(const char* path, std::vector<sf::Vector2f>& spawns)
+{
+	std::vector<sf::Vector2f> sp;
+
+	std::ifstream file;
+	file.open(path);
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open file: " << path << std::endl;
+		return;
+	}
+
+	std::string tmp;
+	sf::Vector2f vec;
+
+	do {
+		std::getline(file, tmp);
+
+		size_t p = tmp.find(':');
+
+		vec.x = atof(tmp.substr(0, p).c_str());
+		vec.y =  atof(tmp.substr(p+1).c_str());
+
+		sp.push_back(vec);
+		
+	} while (!file.eof());
+
+	spawns = sp;
+}
+
+std::string FileWriter::LoadText(const char* path)
+{
+	std::ifstream file(path);
+	//file.open(path);
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open file: " << path << std::endl;
+		return "Error";
+	}
+
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	
+	return content;
+}

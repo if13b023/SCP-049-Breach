@@ -1,8 +1,13 @@
 #pragma once
+
+#define _USE_MATH_DEFINES
+
 #include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 #include <ltbl\lighting\LightShape.h>
 #include <vector>
 #include "normalize.h"
+#include <iostream>
 
 class Character
 {
@@ -29,6 +34,8 @@ public:
 	float getStamina() const;
 	float getWalkSpeed(float dt = 1.0f);
 
+	sf::Vector2f getDirection();
+
 	void setState(charState);
 	int getState();
 
@@ -44,12 +51,17 @@ public:
 
 	void attack(Character&);
 	bool damage(float);
+	float gotHit();
 
 	float getHealth() const;
 
 	void update(float);
 
+	void enable(bool);
+	bool isEnabled();
+
 protected:
+	bool m_enabled;
 	charState m_state;
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
@@ -62,6 +74,7 @@ protected:
 	float m_attackDmg;
 	float m_attackSpeed;
 	float m_attackCooldown;
+	float m_gotHit;
 
 	void updateBoundingSize();
 	virtual void update_internal(float);

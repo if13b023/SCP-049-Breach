@@ -8,7 +8,9 @@ Character::Character()
 		m_state(Character::Walk),
 		m_attackDmg(49.0f),
 		m_attackSpeed(30.0f),
-		m_attackCooldown(0.0f)
+		m_attackCooldown(0.0f),
+		m_gotHit(0),
+		m_enabled(true)
 {
 }
 
@@ -140,7 +142,10 @@ void Character::attack(Character& c)
 bool Character::damage(float dmg)
 {
 	if (health > 0)
+	{
 		health -= dmg;
+		m_gotHit = 0.15f;
+	}
 
 	if (health < 0)
 	{
@@ -149,6 +154,11 @@ bool Character::damage(float dmg)
 	}
 
 	return true; //Alive
+}
+
+float Character::gotHit()
+{
+	return m_gotHit;
 }
 
 float Character::getHealth() const
@@ -200,7 +210,7 @@ float Character::getWalkSpeed(float dt)
 			if (stamina > 0)
 			{
 				stamina -= 30.0f * dt;
-				return walkSpeed * 1.5f * dt;
+				return walkSpeed * 3.0f * dt;
 			}
 			else
 				return walkSpeed * dt;
@@ -208,6 +218,11 @@ float Character::getWalkSpeed(float dt)
 	}
 
 	return 0;
+}
+
+sf::Vector2f Character::getDirection()
+{
+	return direction;
 }
 
 void Character::setState(charState newState)
@@ -223,4 +238,14 @@ int Character::getState()
 float Character::getAttackDmg()
 {
 	return m_attackDmg;
+}
+
+void Character::enable(bool b)
+{
+	m_enabled = b;
+}
+
+bool Character::isEnabled()
+{
+	return m_enabled;
 }

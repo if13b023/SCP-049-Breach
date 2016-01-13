@@ -8,6 +8,8 @@ MainCharacter::MainCharacter()
 		m_attackRange(10.0f)
 {
 	m_attackDmg = 110.0f;
+
+	walkSpeed = 100.0f;
 }
 
 
@@ -62,6 +64,11 @@ void MainCharacter::update_internal(float dt)
 		m_attackCooldown -= (m_attackSpeed*dt);
 	}
 	//*** ac
+
+	//GotHit Cooldown
+	if (m_gotHit > 0)
+		m_gotHit -= dt;
+	//***
 }
 
 bool MainCharacter::hasKey()

@@ -1,6 +1,7 @@
 #include <ltbl\lighting\LightSystem.h>
 
-#include <SFML/Graphics.hpp>
+#include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 
 #include <sstream>
 #include <cassert>
@@ -15,16 +16,17 @@
 #include "Character.h"
 #include "Zombie.h"
 #include "MainCharacter.h"
+#include "SCP049.h"
 
 #include "normalize.h"
 
-enum GameState{Running, Win, Lose};
+enum GameState{Running, Win, Lose, Paused, Intro};
 
 int main(int argc, char** argv)
 {
-	FreeConsole();
+	//FreeConsole();
 
-	GameState state = Running;
+	GameState state = Intro;
 
 	//argument parsing
 	//for (int i = 0; i < argc; i++)
@@ -42,6 +44,8 @@ int main(int argc, char** argv)
 
 	std::list<std::thread> threads;
 	srand(static_cast<unsigned int>(time(NULL)));
+
+	FileWriter fw;
 
 	//creating the window
 	sf::RenderWindow window;
@@ -69,12 +73,22 @@ int main(int argc, char** argv)
 	loading.setPosition(10.0f, 10.0f);
 	window.draw(loading);
 	window.display();
+
+	std::string introText(fw.LoadText("data/intro.txt"));
 	//** ls
+
+	//Music
+	sf::Music music;
+	music.openFromFile("sounds/maintheme.wav");
+	music.setLoop(true);
+	music.setVolume(60);
+	music.play();
+	//***
 
 	//loading Textures and creating Sprites
 	sf::Texture bgTex;
 	//assert(bgTex.loadFromFile("data/Level1_b.jpg"));
-	if (!bgTex.loadFromFile("data/Level1_2_big.jpg"))
+	if (!bgTex.loadFromFile("data/Level1_3_big.jpg"))
 		abort();
 	bgTex.setRepeated(false);
 
@@ -84,7 +98,7 @@ int main(int argc, char** argv)
 
 	sf::Texture bgTopTex;
 	//assert(bgTopTex.loadFromFile("data/Level1_2_big_top.png"));
-	if (!bgTopTex.loadFromFile("data/Level1_2_big_top.png"))
+	if (!bgTopTex.loadFromFile("data/Level1_3_big_top.png"))
 		abort();
 	bgTopTex.setRepeated(false);
 
@@ -94,7 +108,7 @@ int main(int argc, char** argv)
 
 	sf::Texture bgLightTex;
 	//assert(bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"));
-	if (!bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"))
+	if (!bgLightTex.loadFromFile("data/Level1_3_big_light.jpg"))
 		abort();
 	bgLightTex.setRepeated(false);
 	bgLightTex.setSmooth(false);
@@ -124,27 +138,87 @@ int main(int argc, char** argv)
 	KeyTex.loadFromFile("tex/KeyCard.png");
 	KeyTex.setSmooth(true);
 
-	/*
-	sf::Texture WinTex;
-	WinTex.loadFromFile("tex/win.png");
-	WinTex.setSmooth(true);
-	sf::Sprite WinSprite(WinTex);
-	WinSprite.setOrigin(WinTex.getSize().x / 2, WinTex.getSize().y / 2);
-	WinSprite.setPosition(vm.width / 2, vm.height / 2);
+	//Sounds
+	sf::SoundBuffer soundbuffer[256];
 
-	sf::Texture LoseTex;
-	LoseTex.loadFromFile("tex/lose.png");
-	LoseTex.setSmooth(true);
-	sf::Sprite LoseSprite(LoseTex);
-	LoseSprite.setOrigin(LoseTex.getSize().x / 2, LoseTex.getSize().y / 2);
-	LoseSprite.setPosition(vm.width / 2, vm.height / 2);*/
+	soundbuffer[0].loadFromFile("sounds/flashlight02_on.wav");	//Flashlight On
+	soundbuffer[1].loadFromFile("sounds/flashlight02_off.wav");	//Flashlight Off
+	soundbuffer[2].loadFromFile("sounds/footgrass_01.wav");	//Footstep1
+	soundbuffer[3].loadFromFile("sounds/footgrass_02.wav");	//Footstep2
+	soundbuffer[4].loadFromFile("sounds/footgrass_03.wav");	//Footstep3
+	soundbuffer[5].loadFromFile("sounds/footgrass_04.wav");	//Footstep4
 
+	sf::Sound flashlightSnd[2];
+	flashlightSnd[0].setBuffer(soundbuffer[0]);
+	flashlightSnd[1].setBuffer(soundbuffer[1]);
+	flashlightSnd[0].setRelativeToListener(true);
+	flashlightSnd[1].setRelativeToListener(true);
+
+	sf::Sound footstepSnd[4];
+	float footstepCnt = 0;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		footstepSnd[i].setBuffer(soundbuffer[i+2]);
+		footstepSnd[i].setRelativeToListener(true);
+	}
+
+	footstepSnd[0].setBuffer(soundbuffer[2]);
+	footstepSnd[1].setBuffer(soundbuffer[3]);
+	footstepSnd[2].setBuffer(soundbuffer[4]);
+	footstepSnd[3].setBuffer(soundbuffer[5]);
+	
+	for (int i = 0; i < 4; ++i)
+		footstepSnd[i].setVolume(20.f);
+
+	soundbuffer[6].loadFromFile("sounds/zombie_moan.wav");
+
+	soundbuffer[7].loadFromFile("sounds/generator.wav");
+	sf::Sound generator[2];
+	
+	for (int i = 0; i < 2; ++i)
+	{
+		generator[i].setBuffer(soundbuffer[7]);
+		generator[i].setLoop(true);
+		generator[i].setVolume(70);
+		generator[i].setRelativeToListener(false);
+		generator[i].setMinDistance(300.0f);
+		generator[i].setAttenuation(4);
+		generator[i].play();
+	}
+
+	generator[0].setPosition(2700, 2700, 0);
+	generator[1].setPosition(3240, 2540, 0);
+	
+	soundbuffer[8].loadFromFile("sounds/pg_patient.wav");
+	soundbuffer[9].loadFromFile("sounds/pg_cure.wav");
+	soundbuffer[10].loadFromFile("sounds/pg_disease.wav");
+	soundbuffer[11].loadFromFile("sounds/pg_findyou.wav");
+	soundbuffer[12].loadFromFile("sounds/pg_help.wav");
+	soundbuffer[13].loadFromFile("sounds/pg_hide.wav");
+	soundbuffer[14].loadFromFile("sounds/pg_run.wav");
+
+	sf::Sound kill;
+	bool died = false;
+	soundbuffer[15].loadFromFile("sounds/pg_kill.wav");
+	kill.setBuffer(soundbuffer[15]);
+
+	soundbuffer[16].loadFromFile("sounds/pg_knife.wav");
+	soundbuffer[17].loadFromFile("sounds/zombie_scream.wav");
+	//***
+	
 	//Key
 	sf::Sprite Key;
 	Key.setTexture(KeyTex);
-	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 4096, (static_cast<float>(rand() % 100) / 100) * 2048);
 	Key.setScale(0.1f, 0.1f);
 	std::cout << "Key: " << Key.getPosition().x << ":" << Key.getPosition().y << std::endl;
+	
+	{
+		std::vector<sf::Vector2f> keySpawns;
+		fw.LoadSpawnPoints("data/keyspawns.txt", keySpawns);
+		int r = rand() % keySpawns.size();
+		Key.setPosition(keySpawns.at(r));
+	}
 	//*** k
 
 	//Exit
@@ -191,7 +265,7 @@ int main(int argc, char** argv)
 
 	lightPoint->_emissionSprite.setOrigin(sf::Vector2f(32.0f, 32.0f));
 	lightPoint->_emissionSprite.setTexture(pointLightTex);
-	lightPoint->_emissionSprite.setScale(sf::Vector2f(7.0f, 7.0f));
+	lightPoint->_emissionSprite.setScale(sf::Vector2f(5.0f, 5.0f));
 	lightPoint->_emissionSprite.setColor(pointColor);
 	lightPoint->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
@@ -213,6 +287,7 @@ int main(int argc, char** argv)
 	mainChar.setScale(0.15f);
 	mainChar.setFlashlight(light);
 	mainChar.setPosition(310.0f, 50.0f);
+	//mainChar.setPosition(2500.0f, 2000.0f);
 
 	Zombie z;
 	if (!z.setSprite("tex/Zombie_01.png"))
@@ -222,25 +297,74 @@ int main(int argc, char** argv)
 	}
 	z.setScale(0.15f);
 	z.setPosition(310.0f, 50.0f);
+	z.breath[0].setBuffer(soundbuffer[6]);
+	z.breath[0].setRelativeToListener(false);
+	z.breath[0].setMinDistance(100.0f);
+	z.breath[0].setAttenuation(3.0f);
+
+	z.scream.setBuffer(soundbuffer[17]);
+
+	sf::Texture ZombieDeadTex[2];
+	
+	ZombieDeadTex[0].loadFromFile("tex/Zombie_dead_01.png");
+	ZombieDeadTex[1].loadFromFile("tex/Zombie_dead_02.png");
 	//***	loading Textures and creating Sprites
 
 	//Creating Zombies
 	//Zombies zombies;
 	std::vector<Zombie> zombies;
 	const int zCount = 10;
-	sf::Vector2f zPositions[zCount];
-	sf::Vector2f zPosTmp;
 	zombies.reserve(16);
-	for (int i = 0; i < zCount; ++i)
+
 	{
-		do {
-			zPosTmp = sf::Vector2f((static_cast<float>(rand()%100)/100) * 4096, (static_cast<float>(rand() % 100) / 100) * 2048);
-			std::cout << zPosTmp.x << ":" << zPosTmp.y << std::endl;
-		} while(false);
-		z.setPosition(zPosTmp);
-		zombies.push_back(z);
+		//sf::Vector2f zPosTmp;
+		std::vector<sf::Vector2f> zSpawns;
+		fw.LoadSpawnPoints("data/zombiespawns.txt", zSpawns);
+		std::vector<bool> zSpawnsUsed;
+		for (int i = 0; i < zSpawns.size(); ++i)
+		{
+			zSpawnsUsed.push_back(false);
+		}
+
+		for (int i = 0; i < zCount; ++i)
+		{
+			//std::cout << zPosTmp.x << ":" << zPosTmp.y << std::endl;
+			int r;
+			do
+			{
+				r = rand() % zSpawns.size();
+				std::cout << i << " > " << r << std::endl;
+			} while (zSpawnsUsed.at(r));
+			zSpawnsUsed.at(r) = true;
+			z.setPosition(zSpawns.at(i));
+			zombies.push_back(z);
+		}
 	}
 	//*** cz
+
+	//SCP049
+	SCP049 plagueDoctor;
+	if (!plagueDoctor.setSprite("tex/SCP049.png"))
+	{
+		std::cout << "Couldn't load \"tex / SCP049.png\"." << std::endl;
+		return 1;
+	}
+	plagueDoctor.setScale(0.08f);
+	plagueDoctor.setPosition(3010.0f, 2150.0f);
+	plagueDoctor.enable(false);
+
+	for (int i = 0; i < 7; ++i)
+	{
+		plagueDoctor.talk[i].setBuffer(soundbuffer[i + 8]);
+		plagueDoctor.talk[i].setRelativeToListener(true);
+		plagueDoctor.talk[i].setPosition(0, 0, 0);
+		plagueDoctor.talk[i].setVolume(80);
+	}
+
+	plagueDoctor.knife.setBuffer(soundbuffer[16]);
+
+	float plagueDoctorDelay = 30.0f;
+	//*** scp
 
 	sf::Event eve;
 
@@ -255,12 +379,12 @@ int main(int argc, char** argv)
 	sf::View view = window.getDefaultView();
 	float zoomFactor = 1.0f;
 	view.zoom(0.5f);
-	FileWriter fw;
+	view.zoom(1.1f);
 	bool show_fps = false;
 
 	window.setVerticalSyncEnabled(false);
 
-	fw.LoadLightShapesFromFile("data/Level1_2_big.jpg.txt", lightShapes, ls);
+	fw.LoadLightShapesFromFile("data/Level1_3_big.jpg.txt", lightShapes, ls);
 	//***	INIT END
 
 	while (!quit)
@@ -280,7 +404,7 @@ int main(int argc, char** argv)
 			if (eve.type == sf::Event::MouseWheelScrolled)
 			{
 				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
-
+				/*
 				if (eve.mouseWheelScroll.delta < 0 && zoomFactor < 2.0f)
 				{
 					zoomFactor += 0.1f;
@@ -290,17 +414,22 @@ int main(int argc, char** argv)
 				{
 					zoomFactor -= 0.1f;
 					view.zoom(0.95f);
-				}
+				}*/
 				break;
 			}
 
 			if (eve.type == sf::Event::MouseButtonPressed)
 			{
-				if (eve.mouseButton.button == sf::Mouse::Left)
+				if (eve.mouseButton.button == sf::Mouse::Left && state == Running)
 				{
+					if (mainChar.getFlashlightSwitch() == false)
+						flashlightSnd[0].play();
+					else
+						flashlightSnd[1].play();
+
 					mainChar.toogleFlashlight();
 				}
-				else if (eve.mouseButton.button == sf::Mouse::Right)
+				else if (eve.mouseButton.button == sf::Mouse::Right && state == Running)
 				{
 					bool collided = false;
 					sf::FloatRect range;
@@ -314,7 +443,11 @@ int main(int argc, char** argv)
 							std::cout << "Attack!\n";
 							mainChar.attack(zombies.at(i));
 							if (zombies.at(i).getState() == Character::Dead)
+							{
+								int r = rand() % 2;
+								zombies.at(i).setSprite(ZombieDeadTex[r]);
 								std::cout << "Zombie died or is dead\n";
+							}
 							break;
 						}
 					}
@@ -333,125 +466,198 @@ int main(int argc, char** argv)
 					break;
 
 				case sf::Keyboard::Escape:
-					quit = true;
+					//quit = true;
+					if (state == Running)
+						state = Paused;
+					else if (state == Paused || state == Win || state == Lose)
+						quit = true;
+					break;
+
+				case sf::Keyboard::Space:
+					if (state == Paused)
+						state = Running;
+					break;
+
+				case sf::Keyboard::Return:
+					if (state == Intro)
+					{
+						state = Running;
+						music.stop();
+						int r = rand() % 7;
+						plagueDoctor.talk[r].play();
+					}
 					break;
 				}
 			}
 		}
 
-		if (mainChar.getState() != Character::Dead)
+		if (mainChar.getState() != Character::Dead && state == Running)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 				mainChar.setState(Character::Run);
 			else
 				mainChar.setState(Character::Walk);
-		}
 
-		//if (mainChar.getFlashlightSwitch())
-			//lightPoint->_emissionSprite.setColor(sf::Color::Black);
-		//else
+			//if (mainChar.getFlashlightSwitch())
+				//lightPoint->_emissionSprite.setColor(sf::Color::Black);
+			//else
 			lightPoint->_emissionSprite.setColor(pointColor);
-		lightPoint->_emissionSprite.setPosition(mainChar.getPosition());
+			lightPoint->_emissionSprite.setPosition(mainChar.getPosition());
 
-		sf::Vector2f moveVec;
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-			moveVec.x = -1.0f;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-			moveVec.x = 1.0f;
+			sf::Vector2f moveVec;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+				moveVec.x = -1.0f;
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+				moveVec.x = 1.0f;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-			moveVec.y = -1.0f;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-			moveVec.y = 1.0f;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+				moveVec.y = -1.0f;
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+				moveVec.y = 1.0f;
 
-		//MainCharacter CollisionDetection
-		bool collided = false;
-		mainChar.move(moveVec, dt);
-		sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
-		float border = 30.0f;
-		bgBounds.height -= border;
-		bgBounds.width -= border;
-		bgBounds.left += border;
-		bgBounds.top += border;
-		mainChar.update(dt);
-		if(!bgBounds.contains(mainChar.getPosition()))
-			mainChar.move(-moveVec, dt);
-		else
-		{
-			if (mainChar.collide(lightShapes))
+			//MainCharacter CollisionDetection
+			bool collided = false;
+			sf::Vector2f mainCharOldPos(mainChar.getPosition());
+			mainChar.move(moveVec, dt);
+
+			if (mainCharOldPos != mainChar.getPosition())
 			{
-				collided = true;
+				footstepCnt += dt;
+
+				float thres;
+
+				if (mainChar.getState() == Character::Walk)
+					thres = 0.6f;
+				else
+					thres = 0.4f;
+
+				if (footstepCnt > thres)
+				{
+					footstepCnt = 0;
+					footstepSnd[rand() % 4].play();
+				}
+			}
+
+			sf::FloatRect bgBounds = bgSprite.getGlobalBounds();
+			float border = 30.0f;
+			bgBounds.height -= border;
+			bgBounds.width -= border;
+			bgBounds.left += border;
+			bgBounds.top += border;
+			mainChar.update(dt);
+			if (!bgBounds.contains(mainChar.getPosition()))
 				mainChar.move(-moveVec, dt);
-			}
-
-			for (int i = 0; i < zombies.size() && !collided; ++i)
+			else
 			{
-				if (mainChar.collide(zombies.at(i)))
+				if (mainChar.collide(lightShapes))
+				{
+					collided = true;
 					mainChar.move(-moveVec, dt);
+				}
+
+				for (int i = 0; i < zombies.size() && !collided; ++i)
+				{
+					if (zombies.at(i).getState() != Character::Dead && mainChar.collide(zombies.at(i)))
+						mainChar.move(-moveVec, dt);
+				}
 			}
-		}
 
-		if (mainChar.getSprite().getGlobalBounds().intersects(Key.getGlobalBounds()))
-		{
-			mainChar.collectKey();
-			Key.setScale(0.5f, 0.5f);
-			Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
-		}
+			if (mainChar.getSprite().getGlobalBounds().intersects(Key.getGlobalBounds()))
+			{
+				mainChar.collectKey();
+				Key.setScale(0.5f, 0.5f);
+				Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
+			}
+			//*** mccd
 
-		if (mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
-		{
-			state = Win;
-			//quit = true;
-		}
+			sf::Listener::setPosition(mainChar.getPosition().x, mainChar.getPosition().y, 0);
 
-		if (mainChar.getState() == Character::Dead)
-		{
-			state = Lose;
-		}
-		//*** mccd
-
-		//AI
-		collided = false;
-		for (int i = 0; i < zombies.size(); ++i)
-		{
-			zombies.at(i).update(dt);
+			//Zombie AI
 			collided = false;
-			sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
-
-			zombies.at(i).move(zmov, dt);
-
-			if (zombies.at(i).collide(lightShapes) || !bgBounds.contains(zombies.at(i).getPosition()))
+			for (int i = 0; i < zombies.size(); ++i)
 			{
-				collided = true;
-				zombies.at(i).move(-zmov, dt);
+				//sf::Vector3f sndTmp(zombies.at(i).getPosition().x, zombies.at(i).getPosition().y, 0);
+				 //zombies.at(i).breath[0].setPosition(sndTmp);
+				if (zombies.at(i).getState() != Character::Dead)
+				{
+					zombies.at(i).update(dt);
+					collided = false;
+					sf::Vector2f zmov = zombies.at(i).think(mainChar) * dt * zombies.at(i).getWalkSpeed();
+
+					zombies.at(i).move(zmov, dt);
+
+					if (zombies.at(i).collide(lightShapes) || !bgBounds.contains(zombies.at(i).getPosition()))
+					{
+						collided = true;
+						zombies.at(i).move(-zmov, dt);
+					}
+
+					for (int j = 0; j < zombies.size() && !collided; ++j)
+					{
+						if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
+							zombies.at(i).move(-zmov, dt);
+					}
+
+					if (!collided && zombies.at(i).collide(mainChar))
+					{
+						zombies.at(i).attack(mainChar);
+						zombies.at(i).move(-zmov, dt);
+					}
+				}
+			}
+			//*** zai
+
+			//PlagueDoctor AI
+			if (plagueDoctorDelay > 0.0f && !plagueDoctor.isEnabled())
+			{
+				plagueDoctorDelay -= dt;
+			}
+			
+			if (plagueDoctorDelay < 0.0f && !plagueDoctor.isEnabled())
+			{
+				plagueDoctorDelay = 1.0f;
+				plagueDoctor.enable(true);
+				plagueDoctor.knife.play();
 			}
 
-			for (int j = 0; j < zombies.size() && !collided; ++j)
+			sf::Vector2f pdmov = plagueDoctor.think(mainChar) * dt * plagueDoctor.getWalkSpeed();
+			plagueDoctor.move(pdmov, dt);
+
+			if (plagueDoctor.isEnabled() && mainChar.getSprite().getGlobalBounds().intersects(plagueDoctor.getBoundingBox()))
 			{
-				if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
-					zombies.at(i).move(-zmov, dt);
+				plagueDoctor.attack(mainChar);
+				plagueDoctor.knife.stop();
 			}
 
-			if (!collided && zombies.at(i).collide(mainChar))
+			plagueDoctor.update(dt);
+			//*** pdai
+
+			view.setCenter(mainChar.getPosition());
+			healthBar.setString(std::to_string(static_cast<int>(mainChar.getHealth())));
+
+			//Flashlight Rotation
+			sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
+			light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
+			mainChar.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
+			//** fr
+
+			//GameState
+			if (state == Running && mainChar.hasKey() && mainChar.getSprite().getGlobalBounds().intersects(exit))
 			{
-				zombies.at(i).attack(mainChar);
-				zombies.at(i).move(-zmov, dt);
+				state = Win;
+				mainChar.setState(Character::Dead);
 			}
+
+			if (mainChar.getState() == Character::Dead && state != Win)
+			{
+				state = Lose;
+			}
+			//*** gs
 		}
-		//*** ai
-
-		view.setCenter(mainChar.getPosition());
-		healthBar.setString(std::to_string(static_cast<int>(mainChar.getHealth())));
-
-		//Flashlight Rotation
-		sf::Vector2f v = light->_emissionSprite.getPosition() - mousePos;
-		light->_emissionSprite.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 135.0f);
-		mainChar.setRotation((atan2f(v.y, v.x) * 180 / 3.1415f) + 90.0f);
-		//** fr
 
 		window.clear();
 
-		if (state == Running)
+		if (state == Running || state == Paused)
 		{
 			window.setView(view);
 
@@ -470,6 +676,9 @@ int main(int argc, char** argv)
 				window.draw(zc);*/
 			}
 			window.draw(mainChar.getSprite());
+
+			if(plagueDoctor.isEnabled())
+				window.draw(plagueDoctor.getSprite());
 
 			sf::RectangleShape rangedraw(sf::Vector2f(100.0f, 100.0f));
 			rangedraw.setPosition(mainChar.getPosition().x - 50.0f, mainChar.getPosition().y - 50.0f);
@@ -511,25 +720,62 @@ int main(int argc, char** argv)
 
 			window.setView(window.getDefaultView());
 
+			sf::RectangleShape bloodyScreen(sf::Vector2f(vm.width, vm.height));
+			bloodyScreen.setFillColor(sf::Color(255, (1.0f - (mainChar.gotHit() / 0.15f)) * 255, (1.0f - (mainChar.gotHit() / 0.15f)) * 255));
+			if (mainChar.gotHit() > 0)
+			{
+				//std::cout << (mainChar.gotHit()/0.3f) * 255 << std::endl;
+				window.draw(bloodyScreen, lightRenderStates);
+			}
+
 			window.draw(healthBar);
 
 			if (mainChar.hasKey())
 				window.draw(Key);
 
+			if (state == Paused)
+			{
+				bloodyScreen.setFillColor(sf::Color(0, 0, 0, 128));
+				window.draw(bloodyScreen);
+				loading.setPosition(50.0f, 50.0f);
+				loading.setString("paused...");
+				window.draw(loading);
+			}
+
 			window.setView(view);
 		}
 		else if (state == Win || state == Lose)
 		{
+			if(music.getStatus() != sf::SoundSource::Playing)
+				music.play();
+
+			if(died == false)
+			{
+				died = true;
+				if(state == Lose)
+					kill.play();
+			}
+
 			if(state == Win)
 				endTitle.setString("YOU ESCAPED");
 			else
+			{
 				endTitle.setString("YOU DIED");
+			}
 
 			window.setView(window.getDefaultView());
 			endTitle.setPosition((vm.width - endTitle.getGlobalBounds().width) / 2, (vm.height - endTitle.getGlobalBounds().height)/2);
 			window.draw(endTitle);
 
 			loading.setString("please press ESC to exit...");
+			loading.setPosition((vm.width - loading.getGlobalBounds().width) / 2, ((vm.height - loading.getGlobalBounds().height) / 2) + 120);
+			window.draw(loading);
+		}
+		else if(state == Intro)
+		{
+			loading.setString(introText);
+			//loading.setString("press ENTER to start");
+			loading.setPosition((vm.width - loading.getGlobalBounds().width) / 2, (vm.height - loading.getGlobalBounds().height) / 2);
 			window.draw(loading);
 		}
 
@@ -540,10 +786,10 @@ int main(int argc, char** argv)
 		cnt++;
 		if (cnt % 100 == 0 && show_fps)
 		{
-			//std::cout << dt << " - " << (1.0f / dt) << " - " << (atan2f(v.y, v.x) * 180 / 3.1415f) << std::endl;
+			std::cout << dt << " - " << (1.0f / dt) << " - " << mainChar.getRotation() << std::endl;
 			
-			sf::Vector2f tf = view.getCenter() - (view.getSize()/2.0f);
-			std::cout << " - " << tf.x << "/" << tf.y << "/" << view.getSize().x << "/" << view.getSize().y << std::endl;
+			//sf::Vector2f tf = view.getCenter() - (view.getSize()/2.0f);
+			//std::cout << " - " << tf.x << "/" << tf.y << "/" << view.getSize().x << "/" << view.getSize().y << std::endl;
 			cnt = 0;
 		}
 	}
