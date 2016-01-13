@@ -20,13 +20,21 @@
 
 #include "normalize.h"
 
-enum GameState{Running, Win, Lose, Paused};
+enum GameState{Running, Win, Lose, Paused, Intro};
 
 int main(int argc, char** argv)
 {
 	//FreeConsole();
 
-	GameState state = Running;
+	GameState state = Intro;
+
+	//Music
+	sf::Music music;
+	music.openFromFile("sounds/maintheme.wav");
+	music.setLoop(true);
+	music.setVolume(80);
+	music.play();
+	//***
 
 	//argument parsing
 	//for (int i = 0; i < argc; i++)
@@ -44,6 +52,8 @@ int main(int argc, char** argv)
 
 	std::list<std::thread> threads;
 	srand(static_cast<unsigned int>(time(NULL)));
+
+	FileWriter fw;
 
 	//creating the window
 	sf::RenderWindow window;
@@ -76,7 +86,7 @@ int main(int argc, char** argv)
 	//loading Textures and creating Sprites
 	sf::Texture bgTex;
 	//assert(bgTex.loadFromFile("data/Level1_b.jpg"));
-	if (!bgTex.loadFromFile("data/Level1_2_big.jpg"))
+	if (!bgTex.loadFromFile("data/Level1_3_big.jpg"))
 		abort();
 	bgTex.setRepeated(false);
 
@@ -86,7 +96,7 @@ int main(int argc, char** argv)
 
 	sf::Texture bgTopTex;
 	//assert(bgTopTex.loadFromFile("data/Level1_2_big_top.png"));
-	if (!bgTopTex.loadFromFile("data/Level1_2_big_top.png"))
+	if (!bgTopTex.loadFromFile("data/Level1_3_big_top.png"))
 		abort();
 	bgTopTex.setRepeated(false);
 
@@ -96,7 +106,7 @@ int main(int argc, char** argv)
 
 	sf::Texture bgLightTex;
 	//assert(bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"));
-	if (!bgLightTex.loadFromFile("data/Level1_2_big_light.jpg"))
+	if (!bgLightTex.loadFromFile("data/Level1_3_big_light.jpg"))
 		abort();
 	bgLightTex.setRepeated(false);
 	bgLightTex.setSmooth(false);
@@ -165,9 +175,15 @@ int main(int argc, char** argv)
 	//Key
 	sf::Sprite Key;
 	Key.setTexture(KeyTex);
-	Key.setPosition((static_cast<float>(rand() % 100) / 100) * 4096, (static_cast<float>(rand() % 100) / 100) * 2048);
 	Key.setScale(0.1f, 0.1f);
 	std::cout << "Key: " << Key.getPosition().x << ":" << Key.getPosition().y << std::endl;
+	
+	{
+		std::vector<sf::Vector2f> keySpawns;
+		fw.LoadSpawnPoints("data/keyspawns.txt", keySpawns);
+		int r = rand() % keySpawns.size();
+		Key.setPosition(keySpawns.at(r));
+	}
 	//*** k
 
 	//Exit
@@ -260,7 +276,7 @@ int main(int argc, char** argv)
 	for (int i = 0; i < zCount; ++i)
 	{
 		do {
-			zPosTmp = sf::Vector2f((static_cast<float>(rand()%100)/100) * 4096, (static_cast<float>(rand() % 100) / 100) * 2048);
+			zPosTmp = sf::Vector2f((static_cast<float>(rand()%100)/100) * 4096, (static_cast<float>(rand() % 100) / 100) * 3072);
 			std::cout << zPosTmp.x << ":" << zPosTmp.y << std::endl;
 		} while(false);
 		z.setPosition(zPosTmp);
@@ -277,6 +293,7 @@ int main(int argc, char** argv)
 	}
 	plagueDoctor.setScale(0.08f);
 	plagueDoctor.setPosition(310.0f, 150.0f);
+	plagueDoctor.enable(false);
 	//*** scp
 
 	sf::Event eve;
@@ -292,12 +309,11 @@ int main(int argc, char** argv)
 	sf::View view = window.getDefaultView();
 	float zoomFactor = 1.0f;
 	view.zoom(0.5f);
-	FileWriter fw;
 	bool show_fps = false;
 
 	window.setVerticalSyncEnabled(false);
 
-	fw.LoadLightShapesFromFile("data/Level1_2_big.jpg.txt", lightShapes, ls);
+	fw.LoadLightShapesFromFile("data/Level1_3_big.jpg.txt", lightShapes, ls);
 	//***	INIT END
 
 	while (!quit)
@@ -375,14 +391,24 @@ int main(int argc, char** argv)
 					break;
 
 				case sf::Keyboard::Escape:
-					quit = true;
-					break;
-
-				case sf::Keyboard::P:
+					//quit = true;
 					if (state == Running)
 						state = Paused;
-					else
+					else if (state == Paused || state == Win || state == Lose)
+						quit = true;
+					break;
+
+				case sf::Keyboard::Space:
+					if (state == Paused)
 						state = Running;
+					break;
+
+				case sf::Keyboard::Return:
+					if (state == Intro)
+					{
+						state = Running;
+						music.stop();
+					}
 					break;
 				}
 			}
@@ -390,7 +416,6 @@ int main(int argc, char** argv)
 
 		if (mainChar.getState() != Character::Dead && state == Running)
 		{
-
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 				mainChar.setState(Character::Run);
 			else
@@ -623,6 +648,9 @@ int main(int argc, char** argv)
 		}
 		else if (state == Win || state == Lose)
 		{
+			if(music.getStatus() != sf::SoundSource::Playing)
+				music.play();
+
 			if(state == Win)
 				endTitle.setString("YOU ESCAPED");
 			else
@@ -633,6 +661,13 @@ int main(int argc, char** argv)
 			window.draw(endTitle);
 
 			loading.setString("please press ESC to exit...");
+			loading.setPosition((vm.width - loading.getGlobalBounds().width) / 2, ((vm.height - loading.getGlobalBounds().height) / 2) + 120);
+			window.draw(loading);
+		}
+		else if(state == Intro)
+		{
+			loading.setString("press ENTER to start");
+			loading.setPosition((vm.width - loading.getGlobalBounds().width) / 2, (vm.height - loading.getGlobalBounds().height) / 2);
 			window.draw(loading);
 		}
 

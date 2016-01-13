@@ -29,3 +29,8 @@ Alpha Limitations
     #   Some collisions are weird
     #   strange shadow glitches on some integrated graphic chips
     
+Credits
+--------
+Game Design, Implementation and Graphics -> Thomas Fischer
+Music -> gℓo - Exorkismos
+    
