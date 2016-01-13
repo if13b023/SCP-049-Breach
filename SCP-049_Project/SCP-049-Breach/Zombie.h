@@ -18,6 +18,7 @@ public:
 	void move(sf::Vector2f, float);
 
 	sf::Sound breath[4];
+	sf::Sound scream;
 private:
 	virtual void update_internal(float dt);
 	sf::CircleShape m_fov;

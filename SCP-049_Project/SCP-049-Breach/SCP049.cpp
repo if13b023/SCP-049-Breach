@@ -6,8 +6,14 @@ SCP049::SCP049()
 	:m_changePos(1.0f),
 	m_changeCnt(0)
 {
-	walkSpeed = 10.0f;
-	m_attackDmg = 99.0f;
+	walkSpeed = 20.0f;
+	m_attackDmg = 150.0f;
+
+	knife.setLoop(true);
+	knife.setRelativeToListener(false);
+	knife.setMinDistance(100.0f);
+	knife.setAttenuation(4);
+	knife.setVolume(80);
 }
 
 
@@ -31,24 +37,36 @@ sf::Vector2f SCP049::think(MainCharacter& main)
 
 	face -= 180.0f;
 	
-	if (m_changeCnt > m_changePos && (face > 50.0f || face < -50.0f))
+	sf::Vector2f distvec = position - main.getPosition();
+	float dist = sqrtf(powf(distvec.x, 2.0f) + powf(distvec.y, 2.0f));
+
+	if (dist > 700.0f)
 	{
-		float a;
-		int t = 80;
-		a = main.getRotation() + t + (rand() % (360 - (2*t)));
+		if (m_changeCnt > m_changePos && (face > 50.0f || face < -50.0f))
+		{
+			float a;
+			int t = 80;
+			a = main.getRotation() + t + (rand() % (360 - (2 * t)));
 
-		//std::cout << "position changed! > " << main.getRotation() << " :: " << a << std::endl;
+			//std::cout << "position changed! > " << main.getRotation() << " :: " << a << std::endl;
 
-		float x = m_target.x - (sinf((a*M_PI) / 180.0f) * 400.0f);
-		float y = m_target.y + (cosf((a*M_PI) / 180.0f) * 400.0f);
+			float x = m_target.x - (sinf((a*M_PI) / 180.0f) * 400.0f);
+			float y = m_target.y + (cosf((a*M_PI) / 180.0f) * 400.0f);
 
-		this->setPosition(x, y);
-		
-		m_changeCnt = 0;
-		m_changePos = 100.0f + (rand() % 200);
-		//m_changePos = 50000000.0f;
+			this->setPosition(x, y);
+
+			m_changeCnt = 0;
+			m_changePos = 100.0f + (rand() % 200);
+
+			if (main.hasKey())
+			{
+				m_changePos *= 2.0f;
+				walkSpeed = 40.0f;
+			}
+			else
+				walkSpeed = 20.0f;
+		}
 	}
-
 	m_changeCnt++;
 
 	return m_target - this->position;
@@ -62,7 +80,7 @@ void SCP049::move(sf::Vector2f mov, float dt)
 
 void SCP049::update_internal(float dt)
 {
-
+	knife.setPosition(position.x, position.y, 0);
 }
 
 

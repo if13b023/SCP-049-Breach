@@ -210,7 +210,7 @@ float Character::getWalkSpeed(float dt)
 			if (stamina > 0)
 			{
 				stamina -= 30.0f * dt;
-				return walkSpeed * 1.5f * dt;
+				return walkSpeed * 3.0f * dt;
 			}
 			else
 				return walkSpeed * dt;

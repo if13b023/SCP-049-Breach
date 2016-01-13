@@ -13,6 +13,8 @@ public:
 	sf::Vector2f think(MainCharacter&);
 	void move(sf::Vector2f, float);
 
+	sf::Sound talk[7];
+	sf::Sound knife;
 protected:
 	sf::Vector2f m_target;
 	float m_changePos;

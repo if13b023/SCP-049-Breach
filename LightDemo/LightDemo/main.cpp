@@ -217,6 +217,10 @@ int main()
 							ls.removeShape(lightShapes.at(lightShapes.size() - 1));
 						}
 					break;
+
+					case sf::Keyboard::Space:
+						std::cout << mousePos.x << ":" << mousePos.y  << std::endl;
+					break;
 				}
 			}
 

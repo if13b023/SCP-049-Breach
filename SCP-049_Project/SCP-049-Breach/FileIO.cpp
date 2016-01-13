@@ -152,3 +152,18 @@ void FileWriter::LoadSpawnPoints(const char* path, std::vector<sf::Vector2f>& sp
 
 	spawns = sp;
 }
+
+std::string FileWriter::LoadText(const char* path)
+{
+	std::ifstream file(path);
+	//file.open(path);
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open file: " << path << std::endl;
+		return "Error";
+	}
+
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	
+	return content;
+}

@@ -15,6 +15,12 @@ Zombie::Zombie()
 	m_target = getPosition();
 	m_targetNext = 0;
 	m_targetChange = 1;
+
+	scream.setLoop(false);
+	scream.setRelativeToListener(false);
+	scream.setMinDistance(400.0f);
+	scream.setAttenuation(4);
+	scream.setVolume(100);
 }
 
 Zombie::~Zombie()
@@ -26,7 +32,8 @@ sf::Vector2f Zombie::think(MainCharacter& main)
 	if (m_state == charState::Dead)
 		return sf::Vector2f(0, 0);
 
-	if (!getFOV().getGlobalBounds().intersects(main.getSprite().getGlobalBounds()))
+	//if (!getFOV().getGlobalBounds().intersects(main.getSprite().getGlobalBounds()))
+	if (!getFOV().getGlobalBounds().contains(main.getPosition()))
 	{
 		if (m_targetChange > m_targetNext)
 		{
@@ -45,8 +52,16 @@ sf::Vector2f Zombie::think(MainCharacter& main)
 	}
 	else
 	{
+		sf::Vector2f distvec = position - main.getPosition();
+		float dist = sqrtf(powf(distvec.x, 2.0f) + powf(distvec.y, 2.0f));
+
 		if (main.getFlashlightSwitch() || m_hasTracked)
 		{
+			if (m_hasTracked == false)
+			{
+				scream.setPosition(position.x, position.y, 0);
+				scream.play();
+			}
 			m_hasTracked = true;
 			m_target = main.getPosition();
 		}
@@ -80,8 +95,9 @@ void Zombie::update_internal(float dt)
 	m_breathnext -= dt;
 	if (m_breathnext < 0)
 	{
-		m_breathnext = 1.0f + (rand() % 2);
+		m_breathnext = 10.0f + (rand() % 10);
 		int r = rand() % 4;
+		breath[r].setPosition(position.x, position.y, 0);
 		breath[r].play();
 	}
 	//*** b

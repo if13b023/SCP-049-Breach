@@ -8,6 +8,8 @@ MainCharacter::MainCharacter()
 		m_attackRange(10.0f)
 {
 	m_attackDmg = 110.0f;
+
+	walkSpeed = 100.0f;
 }
 
 

@@ -19,5 +19,7 @@ public:
 	void LoadLightShapesFromFile(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&, ltbl::LightSystem&);
 	
 	void LoadSpawnPoints(const char* path, std::vector<sf::Vector2f>& spawns);
+
+	std::string LoadText(const char*);
 };
 
