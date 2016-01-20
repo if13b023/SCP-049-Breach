@@ -55,7 +55,7 @@ sf::Vector2f Zombie::think(MainCharacter& main)
 		sf::Vector2f distvec = position - main.getPosition();
 		float dist = sqrtf(powf(distvec.x, 2.0f) + powf(distvec.y, 2.0f));
 
-		if (main.getFlashlightSwitch() || m_hasTracked)
+		if (main.getFlashlightSwitch() || m_hasTracked || dist < 100.0f)
 		{
 			if (m_hasTracked == false)
 			{

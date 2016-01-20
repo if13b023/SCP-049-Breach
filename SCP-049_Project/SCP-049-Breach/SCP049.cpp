@@ -24,6 +24,9 @@ SCP049::~SCP049()
 
 sf::Vector2f SCP049::think(MainCharacter& main)
 {
+	if (m_enabled == false)
+		return sf::Vector2f(0, 0);
+
 	m_target = main.getPosition();
 	sf::Vector2f tmp = normalize(m_target - this->getPosition());
 	float rot = (atan2f(tmp.y, tmp.x) * 180 / M_PI) - 90.0f;
@@ -55,7 +58,7 @@ sf::Vector2f SCP049::think(MainCharacter& main)
 
 	if (dist > 700.0f)
 	{
-		if (m_changeCnt > m_changePos && (face > 50.0f || face < -50.0f))
+		if (m_changeCnt > m_changePos /*&& (face > 50.0f || face < -50.0f)*/)
 		{
 			float a;
 			int t = 80;

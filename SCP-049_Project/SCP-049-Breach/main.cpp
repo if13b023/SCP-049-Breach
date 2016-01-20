@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 
 	//Music
 	sf::Music music;
-	music.openFromFile("sounds/maintheme.wav");
+	music.openFromFile("sounds/hauntyou.ogg");
 	music.setLoop(true);
 	music.setVolume(60);
 	music.play();
@@ -287,7 +287,7 @@ int main(int argc, char** argv)
 	mainChar.setScale(0.15f);
 	mainChar.setFlashlight(light);
 	mainChar.setPosition(310.0f, 50.0f);
-	//mainChar.setPosition(2500.0f, 2000.0f);
+	//mainChar.setPosition(2500.0f, 2300.0f);
 
 	Zombie z;
 	if (!z.setSprite("tex/Zombie_01.png"))
