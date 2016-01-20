@@ -1,6 +1,6 @@
-You are a security guard at SCP-Facility [REDACTED] 
-There was an accident and SCP-049 a.k.a. The Plague Doctor escaped from its cell
-The whole area is under quarantine and locked up
-There is a key somewhere, you have to find it and escape before IT catches you!
+You are a security guard at SCP-Facility [REDACTED]  -STOP-
+There was an accident and SCP-049 a.k.a. The Plague Doctor escaped from its cell -STOP-
+The whole area is under quarantine and locked up -STOP-
+There is a keycard somewhere, you have to find it and escape before IT catches you! -STOP-
 
 press ENTER to start...
