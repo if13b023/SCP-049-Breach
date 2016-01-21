@@ -5,7 +5,9 @@
 MainCharacter::MainCharacter()
 	:	m_lightswitch(true),
 		m_hasKey(false),
-		m_attackRange(10.0f)
+		m_attackRange(10.0f),
+		m_batteryMax(180.0f),	//3min Flashlight
+		m_battery(m_batteryMax)
 {
 	m_attackDmg = 110.0f;
 
@@ -32,7 +34,8 @@ bool MainCharacter::toogleFlashlight()
 	else
 	{
 		m_lightswitch = true;
-		m_flashlight->_emissionSprite.setColor(sf::Color::White);
+		float value = (m_battery / m_batteryMax) * 255;
+		m_flashlight->_emissionSprite.setColor(sf::Color(value, value, value));
 	}
 	return m_lightswitch;
 }
@@ -48,6 +51,11 @@ void MainCharacter::move(sf::Vector2f pos, float dt)
 		return;
 	Character::move(pos, dt);
 	m_flashlight->_emissionSprite.setPosition(position);
+}
+
+sf::Vector2f MainCharacter::getViewPoint()
+{
+	return m_viewPoint;
 }
 
 void MainCharacter::update_internal(float dt)
@@ -68,6 +76,22 @@ void MainCharacter::update_internal(float dt)
 	//GotHit Cooldown
 	if (m_gotHit > 0)
 		m_gotHit -= dt;
+	//***
+
+	//Adjust Viewpoint
+	float rotation = m_sprite.getRotation() + 90.0f;
+	float dist = 100.0f;
+	m_viewPoint.x = (cosf((rotation*M_PI) / 180.0f)) * dist;
+	m_viewPoint.y = (sinf((rotation*M_PI) / 180.0f)) * dist;
+	//***
+
+	//Flashlight
+	if (m_lightswitch && (m_battery / m_batteryMax) > 0.1f)
+	{
+		m_battery -= dt;
+		float value = (m_battery / m_batteryMax) * 255;
+		m_flashlight->_emissionSprite.setColor(sf::Color(value, value, value));
+	}
 	//***
 }
 

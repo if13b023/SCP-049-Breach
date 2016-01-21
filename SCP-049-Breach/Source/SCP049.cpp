@@ -12,8 +12,8 @@ SCP049::SCP049()
 
 	knife.setLoop(true);
 	knife.setRelativeToListener(false);
-	knife.setMinDistance(100.0f);
-	knife.setAttenuation(4);
+	knife.setMinDistance(200.0f);
+	knife.setAttenuation(3);
 	knife.setVolume(80);
 }
 
@@ -24,6 +24,9 @@ SCP049::~SCP049()
 
 sf::Vector2f SCP049::think(MainCharacter& main)
 {
+	if (m_enabled == false)
+		return sf::Vector2f(0, 0);
+
 	m_target = main.getPosition();
 	sf::Vector2f tmp = normalize(m_target - this->getPosition());
 	float rot = (atan2f(tmp.y, tmp.x) * 180 / M_PI) - 90.0f;
@@ -55,13 +58,22 @@ sf::Vector2f SCP049::think(MainCharacter& main)
 
 	if (dist > 700.0f)
 	{
-		if (m_changeCnt > m_changePos && (face > 50.0f || face < -50.0f))
+		if (m_changeCnt > m_changePos /*&& (face > 50.0f || face < -50.0f)*/)
 		{
+			float changepos_multiplier = 1.0f;
+			if (main.hasKey())
+			{
+				changepos_multiplier = 0.5f;
+				walkSpeed = 40.0f;
+			}
+			else
+				walkSpeed = 20.0f;
+
 			float a;
 			int t = 80;
 			a = main.getRotation() + t + (rand() % (360 - (2 * t)));
 
-			//std::cout << "position changed! > " << main.getRotation() << " :: " << a << std::endl;
+			std::cout << "position changed! > " << main.getRotation() << " :: " << a << std::endl;
 
 			float x = m_target.x - (sinf((a*M_PI) / 180.0f) * 400.0f);
 			float y = m_target.y + (cosf((a*M_PI) / 180.0f) * 400.0f);
@@ -69,15 +81,7 @@ sf::Vector2f SCP049::think(MainCharacter& main)
 			this->setPosition(x, y);
 
 			m_changeCnt = 0;
-			m_changePos = 100.0f + (rand() % 200);
-
-			if (main.hasKey())
-			{
-				m_changePos *= 2.0f;
-				walkSpeed = 40.0f;
-			}
-			else
-				walkSpeed = 20.0f;
+			m_changePos = (100.0f * changepos_multiplier) + (rand() % 200);
 		}
 	}
 	m_changeCnt++;

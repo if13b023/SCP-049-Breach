@@ -24,7 +24,7 @@ enum GameState{Running, Win, Lose, Paused, Intro};
 
 int main(int argc, char** argv)
 {
-	//FreeConsole();
+	FreeConsole();
 
 	GameState state = Intro;
 
@@ -35,8 +35,8 @@ int main(int argc, char** argv)
 
 	//INIT
 	sf::VideoMode vm;
-	vm.width = 1280;
-	vm.height = 720;
+	vm.height = 1080;
+	vm.width = 1920;
 	vm.bitsPerPixel = 32;
 	//assert(vm.isValid());
 	if (!vm.isValid())
@@ -49,15 +49,15 @@ int main(int argc, char** argv)
 
 	//creating the window
 	sf::RenderWindow window;
-	uint32_t style = sf::Style::Close | sf::Style::Titlebar;
+	uint32_t style = sf::Style::Fullscreen;
 
 	if (argc > 1)
 	{
-		if (strcmp(argv[1], "-fullscreen") == 0)
+		if (strcmp(argv[1], "-windowed") == 0)
 		{
-			vm.height = 1080;
-			vm.width = 1920;
-			style = sf::Style::Fullscreen;
+			vm.width = 1280;
+			vm.height = 720;
+			style = sf::Style::Close | sf::Style::Titlebar;
 		}
 
 	}
@@ -79,10 +79,15 @@ int main(int argc, char** argv)
 
 	//Music
 	sf::Music music;
-	music.openFromFile("sounds/maintheme.wav");
+	music.openFromFile("sounds/hauntyou.ogg");
 	music.setLoop(true);
 	music.setVolume(60);
 	music.play();
+
+	sf::Music musicBg;
+	musicBg.openFromFile("sounds/glo.ogg");
+	musicBg.setLoop(true);
+	musicBg.setVolume(20);
 	//***
 
 	//loading Textures and creating Sprites
@@ -205,6 +210,8 @@ int main(int argc, char** argv)
 
 	soundbuffer[16].loadFromFile("sounds/pg_knife.wav");
 	soundbuffer[17].loadFromFile("sounds/zombie_scream.wav");
+
+	soundbuffer[18].loadFromFile("sounds/boom.wav");
 	//***
 	
 	//Key
@@ -219,6 +226,8 @@ int main(int argc, char** argv)
 		int r = rand() % keySpawns.size();
 		Key.setPosition(keySpawns.at(r));
 	}
+	sf::Sound boom(soundbuffer[18]);
+	boom.setLoop(false);
 	//*** k
 
 	//Exit
@@ -265,7 +274,7 @@ int main(int argc, char** argv)
 
 	lightPoint->_emissionSprite.setOrigin(sf::Vector2f(32.0f, 32.0f));
 	lightPoint->_emissionSprite.setTexture(pointLightTex);
-	lightPoint->_emissionSprite.setScale(sf::Vector2f(5.0f, 5.0f));
+	lightPoint->_emissionSprite.setScale(sf::Vector2f(7.0f, 7.0f));
 	lightPoint->_emissionSprite.setColor(pointColor);
 	lightPoint->_emissionSprite.setPosition(sf::Vector2f(0.0f, 0.0f));
 
@@ -287,7 +296,6 @@ int main(int argc, char** argv)
 	mainChar.setScale(0.15f);
 	mainChar.setFlashlight(light);
 	mainChar.setPosition(310.0f, 50.0f);
-	//mainChar.setPosition(2500.0f, 2000.0f);
 
 	Zombie z;
 	if (!z.setSprite("tex/Zombie_01.png"))
@@ -358,12 +366,12 @@ int main(int argc, char** argv)
 		plagueDoctor.talk[i].setBuffer(soundbuffer[i + 8]);
 		plagueDoctor.talk[i].setRelativeToListener(true);
 		plagueDoctor.talk[i].setPosition(0, 0, 0);
-		plagueDoctor.talk[i].setVolume(80);
+		plagueDoctor.talk[i].setVolume(90);
 	}
 
 	plagueDoctor.knife.setBuffer(soundbuffer[16]);
 
-	float plagueDoctorDelay = 30.0f;
+	float plagueDoctorDelay = 45.0f;
 	//*** scp
 
 	sf::Event eve;
@@ -379,7 +387,7 @@ int main(int argc, char** argv)
 	sf::View view = window.getDefaultView();
 	float zoomFactor = 1.0f;
 	view.zoom(0.5f);
-	view.zoom(1.1f);
+	//view.zoom(1.5f);
 	bool show_fps = false;
 
 	window.setVerticalSyncEnabled(false);
@@ -438,7 +446,7 @@ int main(int argc, char** argv)
 					range.top = mainChar.getPosition().y - 50.0f;
 					for (int i = 0; i < zombies.size() && !collided; ++i)
 					{
-						if(range.intersects(zombies.at(i).getBoundingBox()))
+						if(zombies.at(i).getState() != Character::Dead && range.intersects(zombies.at(i).getBoundingBox()))
 						{
 							std::cout << "Attack!\n";
 							mainChar.attack(zombies.at(i));
@@ -483,6 +491,7 @@ int main(int argc, char** argv)
 					{
 						state = Running;
 						music.stop();
+						musicBg.play();
 						int r = rand() % 7;
 						plagueDoctor.talk[r].play();
 					}
@@ -564,6 +573,10 @@ int main(int argc, char** argv)
 
 			if (mainChar.getSprite().getGlobalBounds().intersects(Key.getGlobalBounds()))
 			{
+				pointColor = sf::Color(80, 80, 80, 255);
+				lightPoint->_emissionSprite.setColor(pointColor);
+				plagueDoctorDelay = 0;
+				boom.play();
 				mainChar.collectKey();
 				Key.setScale(0.5f, 0.5f);
 				Key.setPosition(window.getDefaultView().getSize().x - 200.0f, 50.0f);
@@ -594,7 +607,7 @@ int main(int argc, char** argv)
 
 					for (int j = 0; j < zombies.size() && !collided; ++j)
 					{
-						if (i != j && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
+						if (i != j && zombies.at(j).getState() != Character::Dead && zombies.at(i).getBoundingBox().intersects(zombies.at(j).getBoundingBox()))
 							zombies.at(i).move(-zmov, dt);
 					}
 
@@ -608,7 +621,7 @@ int main(int argc, char** argv)
 			//*** zai
 
 			//PlagueDoctor AI
-			if (plagueDoctorDelay > 0.0f && !plagueDoctor.isEnabled())
+			if (plagueDoctorDelay >= 0.0f && !plagueDoctor.isEnabled())
 			{
 				plagueDoctorDelay -= dt;
 			}
@@ -718,7 +731,7 @@ int main(int argc, char** argv)
 			
 			lightRenderStates.blendMode = sf::BlendMultiply;
 
-			window.setView(window.getDefaultView());
+			//window.setView(window.getDefaultView());
 
 			sf::RectangleShape bloodyScreen(sf::Vector2f(vm.width, vm.height));
 			bloodyScreen.setFillColor(sf::Color(255, (1.0f - (mainChar.gotHit() / 0.15f)) * 255, (1.0f - (mainChar.gotHit() / 0.15f)) * 255));
@@ -738,7 +751,7 @@ int main(int argc, char** argv)
 				bloodyScreen.setFillColor(sf::Color(0, 0, 0, 128));
 				window.draw(bloodyScreen);
 				loading.setPosition(50.0f, 50.0f);
-				loading.setString("paused...");
+				loading.setString("paused...\npress SPACE to continue\nor ESC to exit");
 				window.draw(loading);
 			}
 
@@ -746,8 +759,13 @@ int main(int argc, char** argv)
 		}
 		else if (state == Win || state == Lose)
 		{
-			if(music.getStatus() != sf::SoundSource::Playing)
+			if (music.getStatus() != sf::SoundSource::Playing)
+			{
+				musicBg.stop();
 				music.play();
+
+				plagueDoctor.knife.stop();
+			}
 
 			if(died == false)
 			{

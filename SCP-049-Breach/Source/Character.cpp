@@ -63,8 +63,7 @@ void Character::setPosition(sf::Vector2f InPos)
 
 void Character::setPosition(float x, float y)
 {
-	position = sf::Vector2f(x, y);
-	m_sprite.setPosition(position);
+	setPosition(sf::Vector2f(x, y));
 }
 
 float Character::getRotation() const

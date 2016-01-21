@@ -55,7 +55,7 @@ sf::Vector2f Zombie::think(MainCharacter& main)
 		sf::Vector2f distvec = position - main.getPosition();
 		float dist = sqrtf(powf(distvec.x, 2.0f) + powf(distvec.y, 2.0f));
 
-		if (main.getFlashlightSwitch() || m_hasTracked)
+		if (main.getFlashlightSwitch() || m_hasTracked || dist < 100.0f)
 		{
 			if (m_hasTracked == false)
 			{
@@ -74,9 +74,19 @@ sf::Vector2f Zombie::think(MainCharacter& main)
 
 void Zombie::move(sf::Vector2f mov, float dt)
 {
-	sf::Vector2f tmp = normalize(m_target - this->getPosition());
-	this->setRotation((atan2f(tmp.y, tmp.x) * 180 / 3.1415f) - 90.0f);
-	Character::move(mov, dt);
+	sf::Vector2f tmp = m_target - position;
+
+	float dist = sqrtf(powf(tmp.x, 2.0f) + powf(tmp.y, 2.0f));
+
+	if (dist > 1.0f)
+	{
+		tmp = normalize(tmp);
+
+		if (tmp.x != 0 && tmp.y != 0)
+			this->setRotation((atan2f(tmp.y, tmp.x) * 180 / 3.1415f) - 90.0f);
+
+		Character::move(mov, dt);
+	}
 }
 
 void Zombie::update_internal(float dt)
